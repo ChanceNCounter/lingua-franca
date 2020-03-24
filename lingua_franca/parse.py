@@ -23,15 +23,15 @@ from lingua_franca.lang.parse_es import *
 from lingua_franca.lang.parse_it import *
 from lingua_franca.lang.parse_sv import *
 
-from lingua_franca.lang.parse_de import extractnumber_de
+from lingua_franca.lang.parse_de import extract_number_de
 from lingua_franca.lang.parse_de import extract_numbers_de
 from lingua_franca.lang.parse_de import extract_datetime_de
 from lingua_franca.lang.parse_de import normalize_de
-from lingua_franca.lang.parse_fr import extractnumber_fr
+from lingua_franca.lang.parse_fr import extract_number_fr
 from lingua_franca.lang.parse_fr import extract_numbers_fr
 from lingua_franca.lang.parse_fr import extract_datetime_fr
 from lingua_franca.lang.parse_fr import normalize_fr
-from lingua_franca.lang.parse_da import extractnumber_da
+from lingua_franca.lang.parse_da import extract_number_da
 from lingua_franca.lang.parse_da import extract_numbers_da
 from lingua_franca.lang.parse_da import extract_datetime_da
 from lingua_franca.lang.parse_da import normalize_da
@@ -115,7 +115,7 @@ def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
         return extract_numbers_cs(text, short_scale, ordinals)
     # TODO: extractnumbers_xx for other languages
     _log_unsupported_language(lang_code,
-                              ['en', 'it', 'fr', 'de', 'da','cs'])
+                              ['en', 'it', 'fr', 'de', 'da', 'cs'])
     return []
 
 
@@ -136,23 +136,23 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
     """
     lang_code = get_primary_lang_code(lang)
     if lang_code == "en":
-        return extractnumber_en(text, short_scale=short_scale,
-                                ordinals=ordinals)
+        return extract_number_en(text, short_scale=short_scale,
+                                 ordinals=ordinals)
     elif lang_code == "es":
-        return extractnumber_es(text)
+        return extract_number_es(text)
     elif lang_code == "pt":
-        return extractnumber_pt(text)
+        return extract_number_pt(text)
     elif lang_code == "it":
-        return extractnumber_it(text, short_scale=short_scale,
-                                ordinals=ordinals)
+        return extract_number_it(text, short_scale=short_scale,
+                                 ordinals=ordinals)
     elif lang_code == "fr":
-        return extractnumber_fr(text)
+        return extract_number_fr(text)
     elif lang_code == "sv":
-        return extractnumber_sv(text)
+        return extract_number_sv(text)
     elif lang_code == "de":
-        return extractnumber_de(text)
+        return extract_number_de(text)
     elif lang_code == "da":
-        return extractnumber_da(text)
+        return extract_number_da(text)
     elif lang_code == "es":
         return extract_numbers_es(text, short_scale, ordinals)
     elif lang_code == "nl":
@@ -164,7 +164,7 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
     # TODO: extractnumber_xx for other languages
     _log_unsupported_language(lang_code,
                               ['en', 'es', 'pt', 'it', 'fr',
-                               'sv', 'de', 'da', 'nl','cs'])
+                               'sv', 'de', 'da', 'nl', 'cs'])
     return text
 
 
@@ -202,7 +202,7 @@ def extract_duration(text, lang=None):
         return extract_duration_cs(text)
 
     # TODO: extract_duration for other languages
-    _log_unsupported_language(lang_code, ['en','cs'])
+    _log_unsupported_language(lang_code, ['en', 'cs'])
     return None
 
 
@@ -286,7 +286,7 @@ def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
 
     # TODO: extract_datetime for other languages
     _log_unsupported_language(lang_code,
-                              ['en', 'es', 'pt', 'it', 'fr', 'sv', 'de', 'da','cs'])
+                              ['en', 'es', 'pt', 'it', 'fr', 'sv', 'de', 'da', 'cs'])
     return text
 
 
@@ -331,7 +331,7 @@ def normalize(text, lang=None, remove_articles=True):
     # TODO: Normalization for other languages
     _log_unsupported_language(lang_code,
                               ['en', 'es', 'pt', 'it', 'fr',
-                               'sv', 'de', 'da', 'nl','cs'])
+                               'sv', 'de', 'da', 'nl', 'cs'])
     return text
 
 
