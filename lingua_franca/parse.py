@@ -22,25 +22,11 @@ from lingua_franca.lang.parse_pt import *
 from lingua_franca.lang.parse_es import *
 from lingua_franca.lang.parse_it import *
 from lingua_franca.lang.parse_sv import *
-
-from lingua_franca.lang.parse_de import extract_number_de
-from lingua_franca.lang.parse_de import extract_numbers_de
-from lingua_franca.lang.parse_de import extract_datetime_de
-from lingua_franca.lang.parse_de import normalize_de
-from lingua_franca.lang.parse_fr import extract_number_fr
-from lingua_franca.lang.parse_fr import extract_numbers_fr
-from lingua_franca.lang.parse_fr import extract_datetime_fr
-from lingua_franca.lang.parse_fr import normalize_fr
-from lingua_franca.lang.parse_da import extract_number_da
-from lingua_franca.lang.parse_da import extract_numbers_da
-from lingua_franca.lang.parse_da import extract_datetime_da
-from lingua_franca.lang.parse_da import normalize_da
-from lingua_franca.lang.parse_nl import normalize_nl, extractnumber_nl, extract_datetime_nl
-from lingua_franca.lang.parse_cs import extractnumber_cs
-from lingua_franca.lang.parse_cs import extract_datetime_cs
-from lingua_franca.lang.parse_cs import extract_numbers_cs
-from lingua_franca.lang.parse_cs import normalize_cs
-from lingua_franca.lang.parse_cs import extract_duration_cs
+from lingua_franca.lang.parse_de import *
+from lingua_franca.lang.parse_fr import *
+from lingua_franca.lang.parse_da import *
+from lingua_franca.lang.parse_nl import *
+from lingua_franca.lang.parse_cs import *
 
 from lingua_franca import _log_unsupported_language
 
@@ -156,8 +142,8 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
     elif lang_code == "es":
         return extract_numbers_es(text, short_scale, ordinals)
     elif lang_code == "nl":
-        return extractnumber_nl(text, short_scale=short_scale,
-                                ordinals=ordinals)
+        return extract_number_nl(text, short_scale=short_scale,
+                                 ordinals=ordinals)
     elif lang_code == "cs":
         return extractnumber_cs(text, short_scale=short_scale,
                                 ordinals=ordinals)
@@ -362,3 +348,62 @@ def get_gender(word, context="", lang=None):
     _log_unsupported_language(lang_code,
                               ['pt', 'it', 'es'])
     return None
+
+
+def is_fractional(input_str, short_scale=True, lang=None):
+    """
+    This function takes the given text and checks if it is a fraction.
+
+    Args:
+        input_str (str): the string to check if fractional
+        short_scale (bool): use short scale if True, long scale if False
+        lang (str): the BCP-47 code for the language to use, None uses default
+    Returns:
+        (bool) or (float): False if not a fraction, otherwise the fraction
+
+    """
+    lang_code = get_primary_lang_code(lang)
+    if lang_code.startswith("en"):
+        return is_fractional_en(input_str, short_scale)
+    elif lang_code.startswith("da"):
+        return is_fractional_da(input_str, short_scale)
+    elif lang_code.startswith("de"):
+        return is_fractional_de(input_str, short_scale)
+    elif lang_code.startswith("es"):
+        return is_fractional_es(input_str, short_scale)
+    elif lang_code.startswith("fr"):
+        return is_fractional_fr(input_str, short_scale)
+    elif lang_code.startswith("it"):
+        return is_fractional_it(input_str, short_scale)
+    elif lang_code.startswith("nl"):
+        return is_fractional_nl(input_str, short_scale)
+    elif lang_code.startswith("pt"):
+        return is_fractional_pt(input_str, short_scale)
+    elif lang_code.startswith("sv"):
+        return is_fractional_sv(input_str, short_scale)
+
+    _log_unsupported_language(lang_code,
+                              ['pt', 'en', 'da', "de", "es", "fr", "it", "sv"])
+    raise NotImplementedError
+
+
+def is_ordinal(input_str, lang=None):
+    """
+    This function takes the given text and checks if it is an ordinal number.
+
+    Args:
+        input_str (str): the string to check if ordinal
+        lang (str): the BCP-47 code for the language to use, None uses default
+    Returns:
+        (bool) or (float): False if not an ordinal, otherwise the number
+        corresponding to the ordinal
+    """
+    lang_code = get_primary_lang_code(lang)
+    if lang_code.startswith("da"):
+        return is_ordinal_da(input_str)
+    elif lang_code.startswith("de"):
+        return is_ordinal_de(input_str)
+
+    _log_unsupported_language(lang_code,
+                              ['da', "de"])
+    raise NotImplementedError
