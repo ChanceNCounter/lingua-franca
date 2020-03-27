@@ -399,8 +399,8 @@ def pronounce_ordinal_en(number):
     raise NotImplementedError
 
 
-def nice_response_en(text):
-    raise NotImplementedError
+# def nice_response_en(text):
+#     raise NotImplementedError
 
 
 def nice_part_of_day_en(dt, speech=True):

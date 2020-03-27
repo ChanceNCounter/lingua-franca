@@ -30,13 +30,63 @@ from lingua_franca.lang.format_da import *
 from lingua_franca.lang.format_cs import *
 
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca import _log_unsupported_language
+from lingua_franca import _log_unsupported_language, common_data
 
 from collections import namedtuple
+from importlib import import_module
 import json
 import os
 import datetime
 import re
+
+
+def no_such_language(lang_code):
+    raise ModuleNotFoundError("loader requested lang code '" + lang_code +
+                              "', but the associated module could not be"
+                              " located.")
+
+
+def formatter_not_implemented(_input, lang_code='en'):
+    raise NotImplementedError("function " + _input + " is not"
+                              " implemented in language " + lang_code)
+
+
+
+# def load_loc_function(function_name, lang_code, module):
+#     """ Finds the localized version of a formatter.
+
+#     Args:
+#         function_name (str): the name of a formatter from
+#             lingua_franca.format, such as "nice_number". No
+#             parenthesis.
+#         lang_code (str): Primary language code, e.g. "en" or "es"
+
+#     Returns:
+#         function: the localized parser, or None
+#     Example:
+#         english_pronounce_number = load_loc_function( \
+#                                                     "pronounce_number", "en")
+#         english_pronounce_number(1.5)
+#             'one point five'
+#     """
+#     # try:
+#     #     module = import_module(".lang.format_" + lang_code,
+#     #                             "lingua_franca")
+#     # except ModuleNotFoundError as e:
+#     #     raise e("Language module " + lang_code + " not found.")
+#     try:
+#         function = getattr(module, function_name + "_" + lang_code)
+#     except AttributeError:
+#         return passthrough
+#     # del module
+#     return function
+_REGISTERED_FUNCTIONS = ["nice_number",
+                         "nice_time",
+                         "pronounce_number",
+                         "nice_date",
+                         "nice_response"]
+
+_LOCALIZED_FUNCTIONS = common_data.populate_localized_function_dict("format")
 
 
 def _translate_word(name, lang):
@@ -344,36 +394,38 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
         (str): The pronounced number
     """
     lang_code = get_primary_lang_code(lang)
-    if lang_code == "en":
-        return pronounce_number_en(number, places=places,
-                                   short_scale=short_scale,
-                                   scientific=scientific,
-                                   ordinals=ordinals)
-    elif lang_code == "it":
-        return pronounce_number_it(number, places=places,
-                                   short_scale=short_scale,
-                                   scientific=scientific)
-    elif lang_code == "es":
-        return pronounce_number_es(number, places=places)
-    elif lang_code == "fr":
-        return pronounce_number_fr(number, places=places)
-    elif lang_code == "de":
-        return pronounce_number_de(number, places=places)
-    elif lang_code == "hu":
-        return pronounce_number_hu(number, places=places)
-    elif lang_code == "nl":
-        return pronounce_number_nl(number, places=places)
-    elif lang_code == "da":
-        return pronounce_number_da(number, places=places)
-    elif lang_code == "pt":
-        return pronounce_number_pt(number, places=places)
-    elif lang_code == "sv":
-        return pronounce_number_sv(number, places=places)
-    elif lang_code == "cs":
-        return pronounce_number_cs(number, places=places,
-                                   short_scale=short_scale,
-                                   scientific=scientific,
-                                   ordinals=ordinals)
+    # if lang_code == "en":
+    #     return pronounce_number_en(number, places=places,
+    #                                short_scale=short_scale,
+    #                                scientific=scientific,
+    #                                ordinals=ordinals)
+    # elif lang_code == "it":
+    #     return pronounce_number_it(number, places=places,
+    #                                short_scale=short_scale,
+    #                                scientific=scientific)
+    # elif lang_code == "es":
+    #     return pronounce_number_es(number, places=places)
+    # elif lang_code == "fr":
+    #     return pronounce_number_fr(number, places=places)
+    # elif lang_code == "de":
+    #     return pronounce_number_de(number, places=places)
+    # elif lang_code == "hu":
+    #     return pronounce_number_hu(number, places=places)
+    # elif lang_code == "nl":
+    #     return pronounce_number_nl(number, places=places)
+    # elif lang_code == "da":
+    #     return pronounce_number_da(number, places=places)
+    # elif lang_code == "pt":
+    #     return pronounce_number_pt(number, places=places)
+    # elif lang_code == "sv":
+    #     return pronounce_number_sv(number, places=places)
+
+    if lang_code in common_data._SUPPORTED_LANGUAGES:
+        return _LOCALIZED_FUNCTIONS[lang_code]["pronounce_number"](
+            number, places=places,
+            short_scale=short_scale,
+            scientific=scientific,
+            ordinals=ordinals)
 
     # Default to just returning the numeric value
     # TODO: Other languages
@@ -596,14 +648,15 @@ def expand_options(parentheses_line: str) -> list:
 
 def nice_response(text, lang=None):
     lang_code = get_primary_lang_code(lang)
-    if lang_code == "nl":
-        return nice_response_nl(text)
-    elif lang_code == "de":
-        return nice_response_de(text)
-    elif lang_code == "da":
-        return nice_response_da(text)
-    elif lang_code == "sv":
-        return nice_response_sv(text)
+    # if lang_code == "nl":
+    #     return nice_response_nl(text)
+    # elif lang_code == "de":
+    #     return nice_response_de(text)
+    # elif lang_code == "da":
+    #     return nice_response_da(text)
+    # elif lang_code == "sv":
+    #     return nice_response_sv(text)
+    return _LOCALIZED_FUNCTIONS[lang_code]["nice_response"](text)
 
     # TODO: other languages
     _log_unsupported_language(lang_code, ['nl', "de", "da", "sv"])
