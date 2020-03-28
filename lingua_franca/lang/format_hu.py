@@ -304,16 +304,3 @@ def nice_time_hu(dt, speech=True, use_24hour=False, use_ampm=False):
                 speak = "reggel " + speak  # 03:00 - 11:59 reggel/in t. morning
 
         return speak
-
-
-def nice_response_hu(text):
-    raise NotImplementedError
-
-
-def nice_part_of_day_hu(dt, speech=True):
-    raise NotImplementedError
-
-
-def nice_ordinal_hu(text, speech=True):
-    raise NotImplementedError
-

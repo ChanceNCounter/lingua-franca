@@ -1322,40 +1322,5 @@ def normalize_nl(text, remove_articles):
     return normalized[1:]  # strip the initial space
 
 
-def get_gender_nl(word, context=""):
-    """ Guess the gender of a word
-
-    Some languages assign genders to specific words.  This method will attempt
-    to determine the gender, optionally using the provided context sentence.
-
-    Args:
-        word (str): The word to look up
-        context (str, optional): String containing word, for context
-
-    Returns:
-        str: The code "m" (male), "f" (female) or "n" (neutral) for the gender,
-             or None if unknown/or unused in the given language.
-    """
-    raise NotImplementedError
-
-
-def is_ordinal_nl(input_str):
-    """
-    This function takes the given text and checks if it is an ordinal number.
-
-    Args:
-        input_str (str): the string to check if ordinal
-    Returns:
-        (bool) or (float): False if not an ordinal, otherwise the number
-        corresponding to the ordinal
-
-    ordinals for 1, 3, 7 and 8 are irregular
-
-    only works for ordinals corresponding to the numbers in da_numbers
-
-    """
-    raise NotImplementedError
-
-
 class DutchNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""

@@ -21,34 +21,6 @@ from lingua_franca.lang.parse_common import *
 from lingua_franca.lang.common_data_es import _ARTICLES_ES, _STRING_NUM_ES
 
 
-def extract_duration_es(text):
-    """ Convert an english phrase into a number of seconds
-
-    Convert things like:
-        "10 minute"
-        "2 and a half hours"
-        "3 days 8 hours 10 minutes and 49 seconds"
-    into an int, representing the total number of seconds.
-
-    The words used in the duration will be consumed, and
-    the remainder returned.
-
-    As an example, "set a timer for 5 minutes" would return
-    (300, "set a timer for").
-
-    Args:
-        text (str): string containing a duration
-
-    Returns:
-        (timedelta, str):
-                    A tuple containing the duration and the remaining text
-                    not consumed in the parsing. The first value will
-                    be None if no duration is found. The text returned
-                    will have whitespace stripped from the ends.
-    """
-    raise NotImplementedError
-
-
 def is_fractional_es(input_str, short_scale=True):
     """
     This function takes the given text and checks if it is a fraction.
@@ -81,24 +53,6 @@ def is_fractional_es(input_str, short_scale=True):
     if (input_str == "milésimo" or input_str == "milésima"):
         return 1.0 / 1000
     return False
-
-
-def is_ordinal_es(input_str):
-    """
-    This function takes the given text and checks if it is an ordinal number.
-
-    Args:
-        input_str (str): the string to check if ordinal
-    Returns:
-        (bool) or (float): False if not an ordinal, otherwise the number
-        corresponding to the ordinal
-
-    ordinals for 1, 3, 7 and 8 are irregular
-
-    only works for ordinals corresponding to the numbers in da_numbers
-
-    """
-    raise NotImplementedError
 
 
 def extract_number_es(text, short_scale=True, ordinals=False):

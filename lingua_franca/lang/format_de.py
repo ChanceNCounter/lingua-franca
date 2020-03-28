@@ -325,7 +325,3 @@ def nice_ordinal_de(text, speech=True):
                     words[idx] = word
             normalized_text = " ".join(words)
     return normalized_text
-
-
-def nice_part_of_day_de(dt, speech=True):
-    raise NotImplementedError
