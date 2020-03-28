@@ -87,7 +87,8 @@ def nice_number_fr(number, speech, denominators=range(1, 21)):
     return strNumber
 
 
-def pronounce_number_fr(num, places=2):
+def pronounce_number_fr(num, places=2, short_scale=True, scientific=False,
+                        ordinals=False):
     """
     Convert a number to it's spoken equivalent
 
