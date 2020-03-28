@@ -76,8 +76,7 @@ def nice_number_it(number, speech, denominators=range(1, 21)):
     return return_string
 
 
-def pronounce_number_it(num, places=2, short_scale=True, scientific=False,
-                        ordinals=False):
+def pronounce_number_it(number, places=2, short_scale=False, scientific=False):
     """
     Convert a number to it's spoken equivalent
     adapted to italian fron en version
@@ -93,6 +92,7 @@ def pronounce_number_it(num, places=2, short_scale=True, scientific=False,
     Returns:
         (str): The pronounced number
     """
+    num = number
     # gestione infinito
     if num == float("inf"):
         return "infinito"

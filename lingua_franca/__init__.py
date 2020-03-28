@@ -1,8 +1,9 @@
 import os
 from os.path import join, expanduser
+from lingua_franca.common_data import _SUPPORTED_LANGUAGES
 
 
-def _log_unsupported_language(language, supported_languages):
+def warn_unsupported_language(language):
     """
     Log a warning when a language is unsupported
 
@@ -12,7 +13,7 @@ def _log_unsupported_language(language, supported_languages):
         supported_languages: [str]
             The list of supported languages.
     """
-    supported = ' '.join(supported_languages)
+    supported = ' '.join(_SUPPORTED_LANGUAGES)
     print('Language "{language}" not recognized! Please make sure your '
                 'language is one of the following: {supported}.'
                 .format(language=language, supported=supported))

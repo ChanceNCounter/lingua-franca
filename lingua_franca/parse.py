@@ -28,7 +28,7 @@ from lingua_franca.lang.parse_da import *
 from lingua_franca.lang.parse_nl import *
 from lingua_franca.lang.parse_cs import *
 
-from lingua_franca import _log_unsupported_language
+from lingua_franca import warn_unsupported_language
 
 
 def fuzzy_match(x, against):
@@ -100,8 +100,7 @@ def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
     elif lang_code == "cs":
         return extract_numbers_cs(text, short_scale, ordinals)
     # TODO: extractnumbers_xx for other languages
-    _log_unsupported_language(lang_code,
-                              ['en', 'it', 'fr', 'de', 'da', 'cs'])
+    warn_unsupported_language(lang_code)
     return []
 
 
@@ -148,9 +147,7 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
         return extractnumber_cs(text, short_scale=short_scale,
                                 ordinals=ordinals)
     # TODO: extractnumber_xx for other languages
-    _log_unsupported_language(lang_code,
-                              ['en', 'es', 'pt', 'it', 'fr',
-                               'sv', 'de', 'da', 'nl', 'cs'])
+    warn_unsupported_language(lang_code)
     return text
 
 
@@ -188,7 +185,7 @@ def extract_duration(text, lang=None):
         return extract_duration_cs(text)
 
     # TODO: extract_duration for other languages
-    _log_unsupported_language(lang_code, ['en', 'cs'])
+    warn_unsupported_language(lang_code)
     return None
 
 
@@ -271,8 +268,7 @@ def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
         return extract_datetime_cs(text, anchorDate, default_time)
 
     # TODO: extract_datetime for other languages
-    _log_unsupported_language(lang_code,
-                              ['en', 'es', 'pt', 'it', 'fr', 'sv', 'de', 'da', 'cs'])
+    warn_unsupported_language(lang_code)
     return text
 
 
@@ -315,9 +311,7 @@ def normalize(text, lang=None, remove_articles=True):
     elif lang_code == "cs":
         return normalize_cs(text, remove_articles)
     # TODO: Normalization for other languages
-    _log_unsupported_language(lang_code,
-                              ['en', 'es', 'pt', 'it', 'fr',
-                               'sv', 'de', 'da', 'nl', 'cs'])
+    warn_unsupported_language(lang_code)
     return text
 
 
@@ -345,8 +339,7 @@ def get_gender(word, context="", lang=None):
     elif lang_code == "it":
         return get_gender_it(word, context)
     # TODO: get_gender_xx for other languages
-    _log_unsupported_language(lang_code,
-                              ['pt', 'it', 'es'])
+    warn_unsupported_language(lang_code)
     return None
 
 
@@ -382,8 +375,7 @@ def is_fractional(input_str, short_scale=True, lang=None):
     elif lang_code.startswith("sv"):
         return is_fractional_sv(input_str, short_scale)
 
-    _log_unsupported_language(lang_code,
-                              ['pt', 'en', 'da', "de", "es", "fr", "it", "sv"])
+    warn_unsupported_language(lang_code)
     raise NotImplementedError
 
 
@@ -404,6 +396,5 @@ def is_ordinal(input_str, lang=None):
     elif lang_code.startswith("de"):
         return is_ordinal_de(input_str)
 
-    _log_unsupported_language(lang_code,
-                              ['da', "de"])
+    warn_unsupported_language(lang_code)
     raise NotImplementedError

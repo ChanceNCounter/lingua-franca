@@ -64,7 +64,7 @@ def nice_number_sv(number, speech, denominators=range(1, 21)):
     return return_string
 
 
-def pronounce_number_sv(num, places=2, short_scale=True, scientific=False,
+def pronounce_number_sv(number, places=2, short_scale=True, scientific=False,
                         ordinals=False):
     """
     Convert a number to it's spoken equivalent
@@ -159,18 +159,18 @@ def pronounce_number_sv(num, places=2, short_scale=True, scientific=False,
         return pronounce_whole_number_sv(num, scale_level) + result
 
     result = ""
-    if abs(num) >= 1000000000000000000000000:  # cannot do more than this
-        return str(num)
-    elif num == 0:
+    if abs(number) >= 1000000000000000000000000:  # cannot do more than this
+        return str(number)
+    elif number == 0:
         return str(_NUM_STRING_SV[0])
-    elif num < 0:
-        return "minus " + pronounce_number_sv(abs(num), places)
+    elif number < 0:
+        return "minus " + pronounce_number_sv(abs(number), places)
     else:
-        if num == int(num):
-            return pronounce_whole_number_sv(num)
+        if number == int(number):
+            return pronounce_whole_number_sv(number)
         else:
-            whole_number_part = floor(num)
-            fractional_part = num - whole_number_part
+            whole_number_part = floor(number)
+            fractional_part = number - whole_number_part
             result += pronounce_whole_number_sv(whole_number_part)
             if places > 0:
                 result += " komma"

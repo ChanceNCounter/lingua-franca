@@ -73,8 +73,7 @@ def nice_number_pt(number, speech, denominators=range(1, 21)):
     return return_string
 
 
-def pronounce_number_pt(number, places=2, short_scale=True, scientific=False,
-                        ordinals=False):
+def pronounce_number_pt(number, places=2):
     """
     Convert a number to it's spoken equivalent
      For example, '5.2' would return 'cinco virgula dois'

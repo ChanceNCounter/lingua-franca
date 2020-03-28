@@ -4,11 +4,24 @@ from warnings import warn
 _SUPPORTED_LANGUAGES = ["da", "de", "en", "es", "fr", "hu",
                         "it", "nl", "pt", "sv", "ru"]
 
-def passthrough(*args):
-    raise NotImplementedError("Formatter not implemented"
-                                " in specified language")
+
 
 def populate_localized_function_dict(lf_module):
+    """Returns a dictionary of dictionaries, containing localized functions.
+
+    Used by the top-level modules to locate, cache, and call localized functions.
+
+    
+    Arguments:
+        lf_module (str) -- the name of the top-level module
+    
+    Returns:
+        Dict -- {language_code : {function_name (str) : function}}
+    
+    Example:
+        populate_localized_function_dict("format")["en"]["pronounce_number"](1)
+        "one"
+    """
     bad_lang_code = "Language code '{}' is registered with" \
                     " Lingua Franca, but its " + lf_module + " module" \
                     " could not be found."
@@ -26,7 +39,9 @@ def populate_localized_function_dict(lf_module):
             try:
                 function = getattr(mod, function_name + "_" + lang_code)
             except AttributeError:
-                function = passthrough
+                function = None
+                warn(Warning("Function '" + function_name + "' not implemented in "
+                             "{}".format(lang_code)))
             return_dict[lang_code][function_name] = function
         del mod
     return return_dict

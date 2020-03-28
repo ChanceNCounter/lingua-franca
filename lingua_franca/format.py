@@ -17,22 +17,23 @@ from os.path import join
 
 from lingua_franca.lang import get_full_lang_code, get_primary_lang_code
 
-from lingua_franca.lang.format_en import *
-from lingua_franca.lang.format_pt import *
-from lingua_franca.lang.format_it import *
-from lingua_franca.lang.format_sv import *
-from lingua_franca.lang.format_hu import *
-from lingua_franca.lang.format_es import *
-from lingua_franca.lang.format_de import *
-from lingua_franca.lang.format_fr import *
-from lingua_franca.lang.format_nl import *
-from lingua_franca.lang.format_da import *
-from lingua_franca.lang.format_cs import *
+# from lingua_franca.lang.format_en import *
+# from lingua_franca.lang.format_pt import *
+# from lingua_franca.lang.format_it import *
+# from lingua_franca.lang.format_sv import *
+# from lingua_franca.lang.format_hu import *
+# from lingua_franca.lang.format_es import *
+# from lingua_franca.lang.format_de import *
+# from lingua_franca.lang.format_fr import *
+# from lingua_franca.lang.format_nl import *
+# from lingua_franca.lang.format_da import *
 
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca import _log_unsupported_language, common_data
+from lingua_franca import warn_unsupported_language, common_data
 
 from collections import namedtuple
+from inspect import signature
+from warnings import warn
 import json
 import os
 import datetime
@@ -46,6 +47,22 @@ _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_part_of_day"]
 
 _LOCALIZED_FUNCTIONS = common_data.populate_localized_function_dict("format")
+
+
+def localized_function_caller(func_name, lang, arguments):
+    lang_code = get_primary_lang_code(lang)
+    if lang_code not in common_data._SUPPORTED_LANGUAGES:
+        warn_unsupported_language(lang_code)
+        return False
+
+    func = _LOCALIZED_FUNCTIONS[lang_code][func_name]
+    if not func:
+        warn("Formatter {} has not been implemented in language "
+             "'{}'".format(func_name, lang_code))
+        return False
+    else:
+        return func(**{arg: val for arg, val in arguments if arg in
+                       signature(func).parameters})
 
 
 def _translate_word(name, lang):
@@ -257,17 +274,11 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     Returns:
         (str): The formatted string.
     """
-    # Convert to spoken representation in appropriate language
-    lang_code = get_primary_lang_code(lang)
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["nice_number"](number, speech, denominators)
-
     # Default to the raw number for unsupported languages,
     # hopefully the STT engine will pronounce understandably.
     # TODO: nice_number_XX for other languages
-    _log_unsupported_language(lang_code, ['en', 'es', 'pt', 'it', 'fr',
-                                          'sv', 'de', 'hu', 'nl', 'da', 'cs'])
-    return str(number)
+    return localized_function_caller("nice_number", lang, locals().items()) \
+        or str(number)
 
 
 def nice_time(dt, lang=None, speech=True, use_24hour=False,
@@ -287,14 +298,9 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
     Returns:
         (str): The formatted time string
     """
-    lang_code = get_primary_lang_code(lang)
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["nice_time"](dt=dt,
-                                                            speech=speech, use_24hour=use_24hour, use_ampm=use_ampm)
-    # TODO: Other languages
-    _log_unsupported_language(lang_code, ['en', 'es', 'pt', 'it', 'fr',
-                                          'sv', 'de', 'hu', 'nl', 'da', 'cs'])
-    return str(dt)
+
+    return localized_function_caller("nice_time", lang, locals().items()) or \
+        str(dt)
 
 
 def pronounce_number(number, lang=None, places=2, short_scale=True,
@@ -313,20 +319,20 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     Returns:
         (str): The pronounced number
     """
-    lang_code = get_primary_lang_code(lang)
+    # lang_code = get_primary_lang_code(lang)
 
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["pronounce_number"](
-            number, places=places,
-            short_scale=short_scale,
-            scientific=scientific,
-            ordinals=ordinals)
+    # if lang_code in common_data._SUPPORTED_LANGUAGES:
+    #     return _LOCALIZED_FUNCTIONS[lang_code]["pronounce_number"](
+    #                                number, places=places,
+    #                                short_scale=short_scale,
+    #                                scientific=scientific,
+    #                                ordinals=ordinals)
 
     # Default to just returning the numeric value
     # TODO: Other languages
-    _log_unsupported_language(lang_code, ['en', 'es', 'pt', 'it', 'fr',
-                                          'sv', 'de', 'hu', 'nl', 'da', 'cs'])
-    return str(number)
+    # warn_unsupported_language(lang_code)
+    return localized_function_caller("pronounce_number", lang,
+                                     locals().items()) or str(number)
 
 
 def nice_date(dt, lang=None, now=None):
@@ -542,39 +548,33 @@ def expand_options(parentheses_line: str) -> list:
 
 
 def nice_response(text, lang=None):
-    lang_code = get_primary_lang_code(lang)
-    # if lang_code == "nl":
-    #     return nice_response_nl(text)
-    # elif lang_code == "de":
-    #     return nice_response_de(text)
-    # elif lang_code == "da":
-    #     return nice_response_da(text)
-    # elif lang_code == "sv":
-    #     return nice_response_sv(text)
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["nice_response"](text)
-
-    # TODO: other languages
-    _log_unsupported_language(lang_code, ['nl', "de", "da", "sv"])
-    return text
+    return localized_function_caller("nice_response", lang,
+                                     locals().items()) or text
 
 
 def nice_ordinal(text, speech=True, lang=None):
-    lang_code = get_primary_lang_code(lang)
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["nice_ordinal"](text, speech, lang)
+    # lang_code = get_primary_lang_code(lang)
+    # if lang_code in common_data._SUPPORTED_LANGUAGES:
+    #     return _LOCALIZED_FUNCTIONS[lang_code]["nice_ordinal"](text, speech, lang)
 
-    # TODO: other languages
-    _log_unsupported_language(lang_code, ["nl", 'de', "da", "sv"])
-    return text
+    # # TODO: other languages
+    # warn_unsupported_language(lang_code)
+    return localized_function_caller("nice_ordinal", lang, locals().items()) \
+        or text
 
 
 def nice_part_of_day(dt, speech=True, lang=None):
-    lang_code = get_primary_lang_code(lang)
-    if lang_code in common_data._SUPPORTED_LANGUAGES:
-        return _LOCALIZED_FUNCTIONS[lang_code]["nice_part_of_day"](dt, speech)
+    # lang_code = get_primary_lang_code(lang)
+    # if lang_code in common_data._SUPPORTED_LANGUAGES:
+    #     return _LOCALIZED_FUNCTIONS[lang_code]["nice_part_of_day"](dt, speech)
 
-    # There is no good lang independent default
-    # TODO: other languages
-    _log_unsupported_language(lang_code, ['nl'])
-    raise NotImplementedError
+    # # There is no good lang independent default
+    # # TODO: other languages
+    # warn_unsupported_language(lang_code)
+    r_val = localized_function_caller(
+        "nice_part_of_day", lang, locals().items())
+    if not r_val:
+        raise NotImplementedError(
+            "nice_part_of_day() is not implemented in " + lang)
+    else:
+        return r_val

@@ -65,7 +65,7 @@ def nice_number_en(number, speech, denominators=range(1, 21)):
     return return_string
 
 
-def pronounce_number_en(num, places=2, short_scale=True, scientific=False,
+def pronounce_number_en(number, places=2, short_scale=True, scientific=False,
                         ordinals=False):
     """
     Convert a number to it's spoken equivalent
@@ -82,6 +82,7 @@ def pronounce_number_en(num, places=2, short_scale=True, scientific=False,
     Returns:
         (str): The pronounced number
     """
+    num = number
     # deal with infinity
     if num == float("inf"):
         return "infinity"
