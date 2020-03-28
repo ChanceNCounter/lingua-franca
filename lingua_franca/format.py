@@ -33,58 +33,22 @@ from lingua_franca.bracket_expansion import SentenceTreeParser
 from lingua_franca import _log_unsupported_language, common_data
 
 from collections import namedtuple
-from importlib import import_module
 import json
 import os
 import datetime
 import re
 
-
-def no_such_language(lang_code):
-    raise ModuleNotFoundError("loader requested lang code '" + lang_code +
-                              "', but the associated module could not be"
-                              " located.")
-
-
-def formatter_not_implemented(_input, lang_code='en'):
-    raise NotImplementedError("function " + _input + " is not"
-                              " implemented in language " + lang_code)
-
-
-
-# def load_loc_function(function_name, lang_code, module):
-#     """ Finds the localized version of a formatter.
-
-#     Args:
-#         function_name (str): the name of a formatter from
-#             lingua_franca.format, such as "nice_number". No
-#             parenthesis.
-#         lang_code (str): Primary language code, e.g. "en" or "es"
-
-#     Returns:
-#         function: the localized parser, or None
-#     Example:
-#         english_pronounce_number = load_loc_function( \
-#                                                     "pronounce_number", "en")
-#         english_pronounce_number(1.5)
-#             'one point five'
-#     """
-#     # try:
-#     #     module = import_module(".lang.format_" + lang_code,
-#     #                             "lingua_franca")
-#     # except ModuleNotFoundError as e:
-#     #     raise e("Language module " + lang_code + " not found.")
-#     try:
-#         function = getattr(module, function_name + "_" + lang_code)
-#     except AttributeError:
-#         return passthrough
-#     # del module
-#     return function
 _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_time",
                          "pronounce_number",
                          "nice_date",
-                         "nice_response"]
+                         "nice_date_time",
+                         "nice_year",
+                         "nice_duration",
+                         "join_list",
+                         "nice_response",
+                         "nice_ordinal",
+                         "nice_part_of_day"]
 
 _LOCALIZED_FUNCTIONS = common_data.populate_localized_function_dict("format")
 
@@ -681,8 +645,7 @@ def nice_ordinal(text, speech=True, lang=None):
 
 def nice_part_of_day(dt, speech=True, lang=None):
     lang_code = get_primary_lang_code(lang)
-    if lang_code == "nl":
-        return nice_part_of_day_nl(dt, speech)
+    return _LOCALIZED_FUNCTIONS[lang_code]["nice_part_of_day"](dt, speech)
 
     # There is no good lang independent default
     # TODO: other languages
