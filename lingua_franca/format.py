@@ -17,17 +17,6 @@ from os.path import join
 
 from lingua_franca.lang import get_full_lang_code, get_primary_lang_code
 
-# from lingua_franca.lang.format_en import *
-# from lingua_franca.lang.format_pt import *
-# from lingua_franca.lang.format_it import *
-# from lingua_franca.lang.format_sv import *
-# from lingua_franca.lang.format_hu import *
-# from lingua_franca.lang.format_es import *
-# from lingua_franca.lang.format_de import *
-# from lingua_franca.lang.format_fr import *
-# from lingua_franca.lang.format_nl import *
-# from lingua_franca.lang.format_da import *
-
 from lingua_franca.common import _localized_function_caller, populate_localized_function_dict
 from lingua_franca.bracket_expansion import SentenceTreeParser
 
@@ -316,18 +305,6 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     Returns:
         (str): The pronounced number
     """
-    # lang_code = get_primary_lang_code(lang)
-
-    # if lang_code in common_data._SUPPORTED_LANGUAGES:
-    #     return _LOCALIZED_FUNCTIONS[lang_code]["pronounce_number"](
-    #                                number, places=places,
-    #                                short_scale=short_scale,
-    #                                scientific=scientific,
-    #                                ordinals=ordinals)
-
-    # Default to just returning the numeric value
-    # TODO: Other languages
-    # warn_unsupported_language(lang_code)
     try:
         r_val = call_localized_function("pronounce_number", lang,
                                         locals().items())
@@ -516,37 +493,37 @@ def join_list(items, connector, sep=None, lang=None):
             " " + items[-1])
 
 
-# def expand_parentheses(sent):
-#     """
-#     ['1', '(', '2', '|', '3, ')'] -> [['1', '2'], ['1', '3']]
-#     For example:
-#     Will it (rain|pour) (today|tomorrow|)?
-#     ---->
-#     Will it rain today?
-#     Will it rain tomorrow?
-#     Will it rain?
-#     Will it pour today?
-#     Will it pour tomorrow?
-#     Will it pour?
-#     Args:
-#         sent (list<str>): List of tokens in sentence
-#     Returns:
-#         list<list<str>>: Multiple possible sentences from original
-#     """
-#     return SentenceTreeParser(sent).expand_parentheses()
+def expand_parentheses(sent):
+    """
+    ['1', '(', '2', '|', '3, ')'] -> [['1', '2'], ['1', '3']]
+    For example:
+    Will it (rain|pour) (today|tomorrow|)?
+    ---->
+    Will it rain today?
+    Will it rain tomorrow?
+    Will it rain?
+    Will it pour today?
+    Will it pour tomorrow?
+    Will it pour?
+    Args:
+        sent (list<str>): List of tokens in sentence
+    Returns:
+        list<list<str>>: Multiple possible sentences from original
+    """
+    return SentenceTreeParser(sent).expand_parentheses()
 
 
-# def expand_options(parentheses_line: str) -> list:
-#     """
-#     Convert 'test (a|b)' -> ['test a', 'test b']
-#     Args:
-#         parentheses_line: Input line to expand
-#     Returns:
-#         List of expanded possibilities
-#     """
-#     # 'a(this|that)b' -> [['a', 'this', 'b'], ['a', 'that', 'b']]
-#     options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
-#     return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
+def expand_options(parentheses_line: str) -> list:
+    """
+    Convert 'test (a|b)' -> ['test a', 'test b']
+    Args:
+        parentheses_line: Input line to expand
+    Returns:
+        List of expanded possibilities
+    """
+    # 'a(this|that)b' -> [['a', 'this', 'b'], ['a', 'that', 'b']]
+    options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
+    return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
 
 
 def nice_response(text, lang=None):
@@ -555,12 +532,6 @@ def nice_response(text, lang=None):
 
 
 def nice_ordinal(text, speech=True, lang=None):
-    # lang_code = get_primary_lang_code(lang)
-    # if lang_code in common_data._SUPPORTED_LANGUAGES:
-    #     return _LOCALIZED_FUNCTIONS[lang_code]["nice_ordinal"](text, speech, lang)
-
-    # # TODO: other languages
-    # warn_unsupported_language(lang_code)
     return call_localized_function("nice_ordinal", lang, locals().items()) \
         or text
 
