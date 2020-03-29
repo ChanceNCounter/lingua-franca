@@ -610,7 +610,7 @@ def extract_datetime_en(text, anchorDate=None, default_time=None):
     On Saturday, "next Monday" would be in 9 days.
 
     Args:
-        string (str): string containing date words
+        text (str): string containing date words
         dateNow (datetime): A reference date/time for "tommorrow", etc
         default_time (time): Time to set if no time was found in the string
 
