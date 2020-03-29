@@ -16,6 +16,7 @@
 from collections import OrderedDict
 from .parse_common import invert_dict
 
+_FUNCTION_NOT_IMPLEMENTED_WARNING = "The requested function is not implemented in English."
 
 _ARTICLES_EN = {'a', 'an', 'the'}
 

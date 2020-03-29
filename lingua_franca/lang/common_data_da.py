@@ -1,3 +1,5 @@
+_FUNCTION_NOT_IMPLEMENTED_WARNING = "Denne funktion er ikke implementeret i 'dk'."
+
 _DA_NUMBERS = {
     'nul': 0,
     'en': 1,

@@ -28,8 +28,8 @@ from lingua_franca.lang import get_full_lang_code, get_primary_lang_code
 # from lingua_franca.lang.format_nl import *
 # from lingua_franca.lang.format_da import *
 
+from lingua_franca import _localized_function_caller, populate_localized_function_dict
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca import warn_unsupported_language, common_data
 
 from collections import namedtuple
 from inspect import signature
@@ -46,23 +46,12 @@ _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_ordinal",
                          "nice_part_of_day"]
 
-_LOCALIZED_FUNCTIONS = common_data.populate_localized_function_dict("format")
+_LOCALIZED_FUNCTIONS = populate_localized_function_dict("format")
 
 
-def localized_function_caller(func_name, lang, arguments):
-    lang_code = get_primary_lang_code(lang)
-    if lang_code not in common_data._SUPPORTED_LANGUAGES:
-        warn_unsupported_language(lang_code)
-        return False
-
-    func = _LOCALIZED_FUNCTIONS[lang_code][func_name]
-    if not func:
-        warn("Formatter {} has not been implemented in language "
-             "'{}'".format(func_name, lang_code))
-        return False
-    else:
-        return func(**{arg: val for arg, val in arguments if arg in
-                       signature(func).parameters})
+def call_localized_function(func_name, lang, arguments):
+    return _localized_function_caller(_LOCALIZED_FUNCTIONS,
+                                      func_name, lang, arguments)
 
 
 def _translate_word(name, lang):
@@ -277,8 +266,13 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     # Default to the raw number for unsupported languages,
     # hopefully the STT engine will pronounce understandably.
     # TODO: nice_number_XX for other languages
-    return localized_function_caller("nice_number", lang, locals().items()) \
-        or str(number)
+    try:
+        r_val = call_localized_function("nice_number", lang, locals().items())\
+            or str(number)
+    except NotImplementedError as e:
+        warn(e.__str__())
+        return str(number)
+    return r_val
 
 
 def nice_time(dt, lang=None, speech=True, use_24hour=False,
@@ -299,7 +293,7 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
         (str): The formatted time string
     """
 
-    return localized_function_caller("nice_time", lang, locals().items()) or \
+    return call_localized_function("nice_time", lang, locals().items()) or \
         str(dt)
 
 
@@ -331,8 +325,8 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     # Default to just returning the numeric value
     # TODO: Other languages
     # warn_unsupported_language(lang_code)
-    return localized_function_caller("pronounce_number", lang,
-                                     locals().items()) or str(number)
+    return call_localized_function("pronounce_number", lang,
+                                   locals().items()) or str(number)
 
 
 def nice_date(dt, lang=None, now=None):
@@ -514,42 +508,42 @@ def join_list(items, connector, sep=None, lang=None):
             " " + items[-1])
 
 
-def expand_parentheses(sent):
-    """
-    ['1', '(', '2', '|', '3, ')'] -> [['1', '2'], ['1', '3']]
-    For example:
-    Will it (rain|pour) (today|tomorrow|)?
-    ---->
-    Will it rain today?
-    Will it rain tomorrow?
-    Will it rain?
-    Will it pour today?
-    Will it pour tomorrow?
-    Will it pour?
-    Args:
-        sent (list<str>): List of tokens in sentence
-    Returns:
-        list<list<str>>: Multiple possible sentences from original
-    """
-    return SentenceTreeParser(sent).expand_parentheses()
+# def expand_parentheses(sent):
+#     """
+#     ['1', '(', '2', '|', '3, ')'] -> [['1', '2'], ['1', '3']]
+#     For example:
+#     Will it (rain|pour) (today|tomorrow|)?
+#     ---->
+#     Will it rain today?
+#     Will it rain tomorrow?
+#     Will it rain?
+#     Will it pour today?
+#     Will it pour tomorrow?
+#     Will it pour?
+#     Args:
+#         sent (list<str>): List of tokens in sentence
+#     Returns:
+#         list<list<str>>: Multiple possible sentences from original
+#     """
+#     return SentenceTreeParser(sent).expand_parentheses()
 
 
-def expand_options(parentheses_line: str) -> list:
-    """
-    Convert 'test (a|b)' -> ['test a', 'test b']
-    Args:
-        parentheses_line: Input line to expand
-    Returns:
-        List of expanded possibilities
-    """
-    # 'a(this|that)b' -> [['a', 'this', 'b'], ['a', 'that', 'b']]
-    options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
-    return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
+# def expand_options(parentheses_line: str) -> list:
+#     """
+#     Convert 'test (a|b)' -> ['test a', 'test b']
+#     Args:
+#         parentheses_line: Input line to expand
+#     Returns:
+#         List of expanded possibilities
+#     """
+#     # 'a(this|that)b' -> [['a', 'this', 'b'], ['a', 'that', 'b']]
+#     options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
+#     return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
 
 
 def nice_response(text, lang=None):
-    return localized_function_caller("nice_response", lang,
-                                     locals().items()) or text
+    return call_localized_function("nice_response", lang,
+                                   locals().items()) or text
 
 
 def nice_ordinal(text, speech=True, lang=None):
@@ -559,20 +553,12 @@ def nice_ordinal(text, speech=True, lang=None):
 
     # # TODO: other languages
     # warn_unsupported_language(lang_code)
-    return localized_function_caller("nice_ordinal", lang, locals().items()) \
+    return call_localized_function("nice_ordinal", lang, locals().items()) \
         or text
 
 
 def nice_part_of_day(dt, speech=True, lang=None):
-    # lang_code = get_primary_lang_code(lang)
-    # if lang_code in common_data._SUPPORTED_LANGUAGES:
-    #     return _LOCALIZED_FUNCTIONS[lang_code]["nice_part_of_day"](dt, speech)
-
-    # # There is no good lang independent default
-    # # TODO: other languages
-    # warn_unsupported_language(lang_code)
-    r_val = localized_function_caller(
-        "nice_part_of_day", lang, locals().items())
+    r_val = call_localized_function("nice_part_of_day", lang, locals().items())
     if not r_val:
         raise NotImplementedError(
             "nice_part_of_day() is not implemented in " + lang)
