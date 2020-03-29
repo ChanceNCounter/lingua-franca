@@ -438,7 +438,7 @@ def normalize_it(text, remove_articles):
     return normalized[1:]
 
 
-def extract_datetime_it(string, dateNow, default_time):
+def extract_datetime_it(text, anchorDate=None, default_time=None):
     def clean_string(s):
         """
             cleans the input string of unneeded punctuation and capitalization
@@ -492,7 +492,7 @@ def extract_datetime_it(string, dateNow, default_time):
                 month_offset != 0 or day_offset is True or hr_offset != 0 or
                 hr_abs or min_offset != 0 or min_abs or sec_offset != 0)
 
-    if string == '' or not dateNow:
+    if text == '' or not anchorDate:
         return None
 
     found = False
@@ -500,8 +500,8 @@ def extract_datetime_it(string, dateNow, default_time):
     day_offset = False
     month_offset = 0
     year_offset = 0
-    today = dateNow.strftime('%w')
-    current_year = dateNow.strftime('%Y')
+    today = anchorDate.strftime('%w')
+    current_year = anchorDate.strftime('%Y')
     from_flag = False
     datestr = ''
     has_year = False
@@ -523,7 +523,7 @@ def extract_datetime_it(string, dateNow, default_time):
     noise_words_2 = ['tra', 'di', 'per', 'fra', 'un ', 'uno', 'lo', 'del',
                      'l', 'in_punto', ' ', 'nella', 'dell']
 
-    words = clean_string(string)
+    words = clean_string(text)
 
     for idx, word in enumerate(words):
         if word == '':
@@ -540,7 +540,7 @@ def extract_datetime_it(string, dateNow, default_time):
             words = [x for x in words if x != 'adesso']
             words = [x for x in words if x]
             result_str = ' '.join(words)
-            extracted_date = dateNow.replace(microsecond=0)
+            extracted_date = anchorDate.replace(microsecond=0)
             return [extracted_date, result_str]
 
         # un paio di  o  tra tre settimane --> secoli
@@ -991,9 +991,9 @@ def extract_datetime_it(string, dateNow, default_time):
                 # ambiguous time, detect whether they mean this evening or
                 # the next morning based on whether it has already passed
                 hr_abs = str_hh
-                if dateNow.hour < str_hh:
+                if anchorDate.hour < str_hh:
                     pass  # No modification needed
-                elif dateNow.hour < str_hh + 12:
+                elif anchorDate.hour < str_hh + 12:
                     str_hh += 12
                     hr_abs = str_hh
                 else:
@@ -1040,7 +1040,7 @@ def extract_datetime_it(string, dateNow, default_time):
 
     # perform date manipulation
 
-    extracted_date = dateNow.replace(microsecond=0)
+    extracted_date = anchorDate.replace(microsecond=0)
 
     if datestr != '':
         en_months = ['january', 'february', 'march', 'april', 'may', 'june',
@@ -1105,7 +1105,7 @@ def extract_datetime_it(string, dateNow, default_time):
         extracted_date = extracted_date + relativedelta(hours=hr_abs,
                                                         minutes=min_abs)
         if (hr_abs != 0 or min_abs != 0) and datestr == '':
-            if not day_specified and dateNow > extracted_date:
+            if not day_specified and anchorDate > extracted_date:
                 extracted_date = extracted_date + relativedelta(days=1)
     if hr_offset != 0:
         extracted_date = extracted_date + relativedelta(hours=hr_offset)

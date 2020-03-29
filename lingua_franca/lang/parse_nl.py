@@ -488,7 +488,7 @@ def extract_duration_nl(text):
     return (duration, text)
 
 
-def extract_datetime_nl(string, dateNow, default_time):
+def extract_datetime_nl(text, anchorDate=None, default_time=None):
     """Convert a human date reference into an exact datetime
 
     Convert things like
@@ -549,7 +549,7 @@ def extract_datetime_nl(string, dateNow, default_time):
                 minAbs or secOffset != 0
             )
 
-    if string == "" or not dateNow:
+    if text == "" or not anchorDate:
         return None
 
     found = False
@@ -557,8 +557,8 @@ def extract_datetime_nl(string, dateNow, default_time):
     dayOffset = False
     monthOffset = 0
     yearOffset = 0
-    today = dateNow.strftime("%w")
-    currentYear = dateNow.strftime("%Y")
+    today = anchorDate.strftime("%w")
+    currentYear = anchorDate.strftime("%Y")
     fromFlag = False
     datestr = ""
     hasYear = False
@@ -583,7 +583,7 @@ def extract_datetime_nl(string, dateNow, default_time):
     year_multiples = ["decennium", "eeuw", "millennium"]
     day_multiples = ["dagen", "weken", "maanden", "jaren"]
 
-    words = clean_string(string)
+    words = clean_string(text)
 
     for idx, word in enumerate(words):
         if word == "":
@@ -600,7 +600,7 @@ def extract_datetime_nl(string, dateNow, default_time):
         if word == "nu" and not datestr:
             resultStr = " ".join(words[idx + 1:])
             resultStr = ' '.join(resultStr.split())
-            extractedDate = dateNow.replace(microsecond=0)
+            extractedDate = anchorDate.replace(microsecond=0)
             return [extractedDate, resultStr]
         elif wordNext in year_multiples:
             multiplier = None
@@ -1130,10 +1130,10 @@ def extract_datetime_nl(string, dateNow, default_time):
                     ((not daySpecified) or dayOffset < 1)):
                 # ambiguous time, detect whether they mean this evening or
                 # the next morning based on whether it has already passed
-                if dateNow.hour < HH or (dateNow.hour == HH and
-                                         dateNow.minute < MM):
+                if anchorDate.hour < HH or (anchorDate.hour == HH and
+                                         anchorDate.minute < MM):
                     pass  # No modification needed
-                elif dateNow.hour < HH + 12:
+                elif anchorDate.hour < HH + 12:
                     HH += 12
                 else:
                     # has passed, assume the next morning
@@ -1185,7 +1185,7 @@ def extract_datetime_nl(string, dateNow, default_time):
 
     # perform date manipulation
 
-    extractedDate = dateNow.replace(microsecond=0)
+    extractedDate = anchorDate.replace(microsecond=0)
 
     if datestr != "":
         # date included an explicit date, e.g. "june 5" or "june 2, 2017"
@@ -1239,7 +1239,7 @@ def extract_datetime_nl(string, dateNow, default_time):
         extractedDate = extractedDate.replace(hour=hrAbs,
                                               minute=minAbs)
         if (hrAbs != 0 or minAbs != 0) and datestr == "":
-            if not daySpecified and dateNow > extractedDate:
+            if not daySpecified and anchorDate > extractedDate:
                 extractedDate = extractedDate + relativedelta(days=1)
     if hrOffset != 0:
         extractedDate = extractedDate + relativedelta(hours=hrOffset)

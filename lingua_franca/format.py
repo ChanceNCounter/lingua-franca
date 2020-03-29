@@ -267,8 +267,7 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     # hopefully the STT engine will pronounce understandably.
     # TODO: nice_number_XX for other languages
     try:
-        r_val = call_localized_function("nice_number", lang, locals().items())\
-            or str(number)
+        r_val = call_localized_function("nice_number", lang, locals().items())
     except NotImplementedError as e:
         warn(e.__str__())
         return str(number)
@@ -293,8 +292,12 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
         (str): The formatted time string
     """
 
-    return call_localized_function("nice_time", lang, locals().items()) or \
-        str(dt)
+    try:
+        r_val = call_localized_function("nice_time", lang, locals().items())
+    except NotImplementedError as e:
+        warn(e.__str__())
+        return str(dt)
+    return r_val
 
 
 def pronounce_number(number, lang=None, places=2, short_scale=True,
@@ -325,8 +328,13 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     # Default to just returning the numeric value
     # TODO: Other languages
     # warn_unsupported_language(lang_code)
-    return call_localized_function("pronounce_number", lang,
-                                   locals().items()) or str(number)
+    try:
+        r_val = call_localized_function("pronounce_number", lang,
+                                        locals().items())
+    except NotImplementedError as e:
+        warn(e.__str__())
+        return str(number)
+    return r_val
 
 
 def nice_date(dt, lang=None, now=None):

@@ -124,7 +124,7 @@ def extract_number_sv(text, short_scale=True, ordinals=False):
     return val or False
 
 
-def extract_datetime_sv(string, currentDate, default_time):
+def extract_datetime_sv(text, anchorDate=None, default_time=None):
     def clean_string(s):
         """
             cleans the input string of unneeded punctuation and capitalization
@@ -155,7 +155,7 @@ def extract_datetime_sv(string, currentDate, default_time):
                 minAbs or secOffset != 0
             )
 
-    if string == "" or not currentDate:
+    if text == "" or not anchorDate:
         return None
 
     found = False
@@ -163,7 +163,7 @@ def extract_datetime_sv(string, currentDate, default_time):
     dayOffset = False
     monthOffset = 0
     yearOffset = 0
-    dateNow = currentDate
+    dateNow = anchorDate
     today = dateNow.strftime("%w")
     currentYear = dateNow.strftime("%Y")
     fromFlag = False
@@ -181,7 +181,7 @@ def extract_datetime_sv(string, currentDate, default_time):
     monthsShort = ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug',
                    'sept', 'oct', 'nov', 'dec']
 
-    words = clean_string(string)
+    words = clean_string(text)
 
     for idx, word in enumerate(words):
         if word == "":

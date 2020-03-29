@@ -222,7 +222,7 @@ def normalize_pt(text, remove_articles):
     return PortugueseNormalizer().normalize(text, remove_articles)
 
 
-def extract_datetime_pt(input_str, currentDate, default_time):
+def extract_datetime_pt(text, anchorDate=None, default_time=None):
     def clean_string(s):
         # cleans the input string of unneeded punctuation and capitalization
         # among other things
@@ -285,7 +285,7 @@ def extract_datetime_pt(input_str, currentDate, default_time):
                 minAbs or secOffset != 0
             )
 
-    if input_str == "" or not currentDate:
+    if text == "" or not anchorDate:
         return None
 
     found = False
@@ -293,7 +293,7 @@ def extract_datetime_pt(input_str, currentDate, default_time):
     dayOffset = False
     monthOffset = 0
     yearOffset = 0
-    dateNow = currentDate
+    dateNow = anchorDate
     today = dateNow.strftime("%w")
     currentYear = dateNow.strftime("%Y")
     fromFlag = False
@@ -301,7 +301,7 @@ def extract_datetime_pt(input_str, currentDate, default_time):
     hasYear = False
     timeQualifier = ""
 
-    words = clean_string(input_str).split(" ")
+    words = clean_string(text).split(" ")
     timeQualifiersList = ['manha', 'tarde', 'noite']
     time_indicators = ["em", "as", "nas", "pelas", "volta", "depois", "estas",
                        "no", "dia", "hora"]

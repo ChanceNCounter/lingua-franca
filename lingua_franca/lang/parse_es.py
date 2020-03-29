@@ -314,7 +314,7 @@ def normalize_es(text, remove_articles):
 
 
 # TODO MycroftAI/mycroft-core#2348
-def extract_datetime_es(input_str, currentDate=None, default_time=None):
+def extract_datetime_es(text, anchorDate=None, default_time=None):
     def clean_string(s):
         # cleans the input string of unneeded punctuation and capitalization
         # among other things
@@ -364,17 +364,17 @@ def extract_datetime_es(input_str, currentDate=None, default_time=None):
                 minAbs or secOffset != 0
             )
 
-    if input_str == "":
+    if text == "":
         return None
-    if currentDate is None:
-        currentDate = datetime.now()
+    if anchorDate is None:
+        anchorDate = datetime.now()
 
     found = False
     daySpecified = False
     dayOffset = False
     monthOffset = 0
     yearOffset = 0
-    dateNow = currentDate
+    dateNow = anchorDate
     today = dateNow.strftime("%w")
     currentYear = dateNow.strftime("%Y")
     fromFlag = False
@@ -382,7 +382,7 @@ def extract_datetime_es(input_str, currentDate=None, default_time=None):
     hasYear = False
     timeQualifier = ""
 
-    words = clean_string(input_str).split(" ")
+    words = clean_string(text).split(" ")
     timeQualifiersList = ['mañana', 'tarde', 'noche']
     time_indicators = ["en", "la", "al", "por", "pasados",
                        "pasadas", "día", "hora"]

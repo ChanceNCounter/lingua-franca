@@ -642,7 +642,7 @@ class TestNormalize(unittest.TestCase):
         mezzogiorno = datetime(2017, 6, 27, 12, 1, 2)
         self.assertEqual(
             extract_datetime('dai da mangiare ai pesci alle 10 in punto',
-                             mattina, lang='it-it')[0],
+                             anchorDate=mattina, lang='it-it')[0],
             datetime(2017, 6, 27, 10, 0, 0))
         self.assertEqual(
             extract_datetime('dai da mangiare ai pesci alle 10 in punto',

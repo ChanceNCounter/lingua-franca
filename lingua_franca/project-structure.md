@@ -48,7 +48,7 @@ For example, formatters which have been or will be localized are registered in
 As of March, 2020, this list looks as follows:
 
   ```python3
-  #lingua_franca/format.py
+  # lingua_franca/format.py
 
   _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_time",

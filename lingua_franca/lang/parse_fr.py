@@ -415,7 +415,7 @@ def extract_number_fr(text, short_scale=True, ordinals=False):
     return result or False
 
 
-def extract_datetime_fr(string, currentDate, default_time):
+def extract_datetime_fr(text, anchorDate=None, default_time=None):
     def clean_string(s):
         """
             cleans the input string of unneeded punctuation and capitalization
@@ -440,7 +440,7 @@ def extract_datetime_fr(string, currentDate, default_time):
                        hrOffset != 0 or minOffset != 0 or secOffset != 0
                )
 
-    if string == "" or not currentDate:
+    if text == "" or not anchorDate:
         return None
 
     found = False
@@ -448,7 +448,7 @@ def extract_datetime_fr(string, currentDate, default_time):
     dayOffset = False
     monthOffset = 0
     yearOffset = 0
-    dateNow = currentDate
+    dateNow = anchorDate
     today = dateNow.strftime("%w")
     currentYear = dateNow.strftime("%Y")
     fromFlag = False
@@ -472,7 +472,7 @@ def extract_datetime_fr(string, currentDate, default_time):
                  'july', 'august', 'september', 'october', 'november',
                  'december']
 
-    words = clean_string(string)
+    words = clean_string(text)
 
     for idx, word in enumerate(words):
         if word == "":
