@@ -26,7 +26,7 @@ from lingua_franca.lang.parse_common import is_numeric, look_for_fractions
 from lingua_franca.lang.common_data_pt import _NUMBERS_PT, \
     _FEMALE_DETERMINANTS_PT, _FEMALE_ENDINGS_PT, \
     _MALE_DETERMINANTS_PT, _MALE_ENDINGS_PT, _GENDERS_PT
-from lingua_franca import resolve_resource_file
+from lingua_franca.common import resolve_resource_file
 from lingua_franca.lang.parse_common import Normalizer
 import json
 import re

@@ -28,7 +28,7 @@ from lingua_franca.lang.parse_da import *
 from lingua_franca.lang.parse_nl import *
 from lingua_franca.lang.parse_cs import *
 
-from lingua_franca import raise_unsupported_language
+from lingua_franca.common import raise_unsupported_language
 
 
 def fuzzy_match(x, against):

@@ -28,7 +28,7 @@ from lingua_franca.lang.common_data_en import _ARTICLES_EN, _NUM_STRING_EN, \
 
 import re
 import json
-from lingua_franca import resolve_resource_file
+from lingua_franca.common import resolve_resource_file
 
 
 def _convert_words_to_numbers_en(text, short_scale=True, ordinals=False):

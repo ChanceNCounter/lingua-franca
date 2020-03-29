@@ -28,7 +28,7 @@ from lingua_franca.lang import get_full_lang_code, get_primary_lang_code
 # from lingua_franca.lang.format_nl import *
 # from lingua_franca.lang.format_da import *
 
-from lingua_franca import _localized_function_caller, populate_localized_function_dict
+from lingua_franca.common import _localized_function_caller, populate_localized_function_dict
 from lingua_franca.bracket_expansion import SentenceTreeParser
 
 from collections import namedtuple
@@ -64,7 +64,7 @@ def _translate_word(name, lang):
     Returns:
         str: translated version of resource name
     """
-    from lingua_franca import resolve_resource_file
+    from lingua_franca.common import resolve_resource_file
 
     lang_code = get_full_lang_code(lang)
 
