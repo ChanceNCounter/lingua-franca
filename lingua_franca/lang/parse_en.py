@@ -611,7 +611,7 @@ def extract_datetime_en(text, anchorDate=None, default_time=None):
 
     Args:
         text (str): string containing date words
-        dateNow (datetime): A reference date/time for "tommorrow", etc
+        anchorDate (datetime): A reference date/time for "tommorrow", etc
         default_time (time): Time to set if no time was found in the string
 
     Returns:
@@ -653,8 +653,9 @@ def extract_datetime_en(text, anchorDate=None, default_time=None):
                 hrAbs or minOffset != 0 or
                 minAbs or secOffset != 0
             )
-
-    if text == "" or not anchorDate:
+    if not anchorDate:
+        anchorDate = datetime.now()
+    if text == "":
         return None
 
     found = False
