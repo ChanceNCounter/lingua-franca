@@ -34,7 +34,7 @@ _LOCALIZED_FUNCTIONS = populate_localized_function_dict("parse")
 
 
 def call_localized_function(func_name, lang, arguments):
-    return _localized_function_caller(_LOCALIZED_FUNCTIONS,
+    return _localized_function_caller("parse", _LOCALIZED_FUNCTIONS,
                                       func_name, lang, arguments)
 
 

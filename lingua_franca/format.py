@@ -39,12 +39,12 @@ _LOCALIZED_FUNCTIONS = populate_localized_function_dict("format")
 
 
 def call_localized_function(func_name, lang, arguments):
-    return _localized_function_caller(_LOCALIZED_FUNCTIONS,
+    return _localized_function_caller("format", _LOCALIZED_FUNCTIONS,
                                       func_name, lang, arguments)
 
 
 def _translate_word(name, lang):
-    """ Helper to get word tranlations
+    """ Helper to get word translations
 
     Args:
         name (str): Word name. Returned as the default value if not translated.

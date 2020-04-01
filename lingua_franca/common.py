@@ -27,11 +27,12 @@ def raise_unsupported_language(language):
                 "include the following:\n{supported}"
                 .format(language=language, supported=supported))
 
-def _localized_function_caller(funcs, func_name, lang, arguments):
+def _localized_function_caller(mod, funcs, func_name, lang, args):
     """Calls a localized function from a dictionary populated by
         `populate_localized_function_dict()`
 
     Arguments:
+        mod (str): the module calling this function
         funcs (dict): the function dictionary (e.g. 
                 `lingua_franca.format._LOCALIZED_FUNCTIONS)
         func_name (str): the name of the function to find and call
@@ -48,18 +49,27 @@ def _localized_function_caller(funcs, func_name, lang, arguments):
     lang_code = get_primary_lang_code(lang)
     if lang_code not in _SUPPORTED_LANGUAGES:
         raise_unsupported_language(lang_code)
-    func = funcs[lang_code][func_name]
-    if not func:
+    elif lang_code not in funcs.keys():
+        raise ModuleNotFoundError(mod + " module of language '" + \
+                                    lang_code +  "' is not currently loaded.")
+    func_signature = funcs[lang_code][func_name]
+    if not func_signature:
         raise KeyError("Something is very wrong with Lingua Franca."
                         " Have you altered the library? If not, please"
                         " contact the developers through GitHub.")
-    elif isinstance(func, type(NotImplementedError())):
-        raise func
-    else:   
-        return func(**{arg: val for arg, val in arguments if arg in
-                    signature(func).parameters})
+    elif isinstance(func_signature, type(NotImplementedError())):
+        raise func_signature
+    else:
+        _module = import_module(".lang." + mod + "_" + lang_code,
+                             "lingua_franca")
+        func = getattr(_module, func_name + "_" + lang_code)
+        r_val = func(**{arg: val for arg, val in args if arg in
+                    func_signature.parameters})
+        del func
+        del _module
+        return r_val
 
-def populate_localized_function_dict(lf_module):
+def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
     """Returns a dictionary of dictionaries, containing localized functions.
 
     Used by the top-level modules to locate, cache, and call localized functions.
@@ -78,7 +88,7 @@ def populate_localized_function_dict(lf_module):
                     " Lingua Franca, but its " + lf_module + " module" \
                     " could not be found."
     return_dict = {}
-    for lang_code in _SUPPORTED_LANGUAGES:
+    for lang_code in langs:
         return_dict[lang_code] = {}
         _FUNCTION_NOT_FOUND = ""
         try:
@@ -86,6 +96,7 @@ def populate_localized_function_dict(lf_module):
                                         "lingua_franca")
             _FUNCTION_NOT_FOUND = getattr(lang_common_data,
                                      "_FUNCTION_NOT_IMPLEMENTED_WARNING")
+            del lang_common_data
         except Exception:
             _FUNCTION_NOT_FOUND = "This function has not been implemented" \
                                   " in the specified language."
@@ -102,15 +113,18 @@ def populate_localized_function_dict(lf_module):
                                 "_REGISTERED_FUNCTIONS")
         for function_name in function_names:
             try:
-                function = getattr(mod, function_name + "_" + lang_code)
+                function = getattr(mod, function_name
+                                                + "_" + lang_code)
+                function_signature = signature(function)
+                del function
             except AttributeError:
-                function = _FUNCTION_NOT_FOUND
+                function_signature = _FUNCTION_NOT_FOUND
                 # TODO log these occurrences: "function 'function_name' not
                 # implemented in language 'lang_code'"
                 #
                 # Perhaps provide this info to autodocs, to help volunteers
                 # identify the functions in need of localization
-            return_dict[lang_code][function_name] = function
+            return_dict[lang_code][function_name] = function_signature
 
         del mod
     return return_dict
