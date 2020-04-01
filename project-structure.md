@@ -2,33 +2,33 @@
 
 ## Source code layout
 
-    - package `lingua_franca`
-      - `common.py`: common functions and data used by the top-level modules
-      - top-level modules (`lingua_franca.format`, `lingua_franca.parse`, etc.)
-          - top-level function definitions (`lingua_franca.format.pronounce_number()`, etc.)
-          - list of the member functions which have been localized ([func_name (str)])
-              ex: `lingua_franca.format.pronounce_number()` 
-                  is registered in this list as `"pronounce_number"`, as it has been localized.
-                  This list enables discovery of localized functions.
-          - dict of localized functions - {lang_code (str) : {func_name (str) : func (function)}}
-          - a helper function, which calls localized functions from top-level functions
-      - lang
-          - localized implementations of top-level functions
-              - files named uniformly, based on module and language code. ex:
-                  `lingua_franca.format` will look for localized functions in
-                  `lingua_franca.lang.format_<lang_code>`, such as
-                  `lingua_franca.lang.format_en` and `lingua_franca.lang.format_es`.
-          - localized `common_data_<lang_code>`
-              - functions and data related to parsing and formatting for a particular language
-                  - names of months, days
-                  - default date and time format
-                  - names of certain numbers
-                  - etc.
-      - res: fully localized data (en_US and en_GB, etc.)
-          - detailed formatting instructions for dates and times
-          - localized vocabulary
-      - test: pyunit tests, files named for their members
-              (`test_format.py`, `test_format_en.py`, `test_format_es.py`, etc.)
+- package `lingua_franca`
+  - `common.py`: common functions and data used by the top-level modules
+  - top-level modules (`lingua_franca.format`, `lingua_franca.parse`, etc.)
+      - top-level function definitions (`lingua_franca.format.pronounce_number()`, etc.)
+      - list of the member functions which have been localized ([func_name (str)])
+          ex: `lingua_franca.format.pronounce_number()` 
+              is registered in this list as `"pronounce_number"`, as it has been localized.
+              This list enables discovery of localized functions.
+      - dict of localized functions - {lang_code (str) : {func_name (str) : func (function)}}
+      - a helper function, which calls localized functions from top-level functions
+  - /lang/
+      - localized implementations of top-level functions
+          - files named uniformly, based on module and language code. ex:
+              `lingua_franca.format` will look for localized functions in
+              `lingua_franca.lang.format_<lang_code>`, such as
+              `lingua_franca.lang.format_en` and `lingua_franca.lang.format_es`.
+      - localized `common_data_<lang_code>`
+          - functions and data related to parsing and formatting for a particular language
+              - names of months, days
+              - default date and time format
+              - names of certain numbers
+              - etc.
+  - /res/: fully localized data (en_US and en_GB, etc.)
+      - detailed formatting instructions for dates and times
+      - localized vocabulary
+  - /test/: pyunit tests, files named for their members
+          (`test_format.py`, `test_format_en.py`, `test_format_es.py`, etc.)
 
 ----
 

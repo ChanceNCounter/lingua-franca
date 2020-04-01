@@ -30,6 +30,8 @@ class Formatter:
     _LOCALIZED_FUNCTIONS = {}
     langs = []
     def __init__(self, langs=_SUPPORTED_LANGUAGES):
+        if isinstance(langs, str):
+            langs = [langs]
         self.langs = [get_primary_lang_code(lang) for lang in langs]
         self._LOCALIZED_FUNCTIONS = populate_localized_function_dict("format",
                                     langs=self.langs)
