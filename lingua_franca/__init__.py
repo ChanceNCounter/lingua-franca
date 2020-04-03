@@ -1,0 +1,1 @@
+from .common import resolve_resource_file
