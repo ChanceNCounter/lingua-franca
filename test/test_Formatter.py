@@ -53,6 +53,15 @@ NUMBERS_FIXTURE_EN = {
     0.05: 'a twentyith'
 }
 
+class TestLoadUnloadLanguages(unittest.TestCase):
+    fmt = Formatter("en")
+    def test_load_language(self):
+        self.assertFalse("es" in self.fmt.langs)
+        self.fmt.load_language("es")
+        self.assertEquals(self.fmt.pronounce_number(1, lang="es"), "uno")
+    def test_unload_language(self):
+        self.fmt.unload_language("es")
+        self.assertFalse("es" in self.fmt.langs)
 
 class TestNiceNumberFormat(unittest.TestCase):
     def test_convert_float_to_nice_number(self):

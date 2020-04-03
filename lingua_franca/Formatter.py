@@ -27,20 +27,79 @@ NUMBER_TUPLE = namedtuple(
     'x_in_x000, x0_in_x000, x_in_0x00'))
 
 class Formatter:
+    ''' An object-oriented interface to Lingua Franca. Can load only those
+        which are currently in use, potentially saving on memory. By default,
+        it will load all languages when instantiated.
+
+        Arguments:
+          langs (str or list(str)): the language code or languages codes which
+                                    you would like to initialize
+
+        Use just like the `format` module:
+            >>>from lingua_franca.Formatter import Formatter
+            >>>fmt = Formatter()
+            >>>fmt.pronounce_number(13)
+            'thirteen'
+            >>>fmt.pronounce_number(13, lang="es")
+            'trece'
+
+        Or initialize it with only the languages you need:
+            >>>fmt = Formatter(["en", "es"])
+
+        It can also accept a single language code as a string, and compensate
+        for the fact that English is missing:
+            >>>fmt = Formatter("es"):
+            >>>fmt.pronounce_number(13)
+            'trece'
+
+
+    '''
     _LOCALIZED_FUNCTIONS = {}
-    langs = []
+    default_language = ""
+    langs = None
+
     def __init__(self, langs=_SUPPORTED_LANGUAGES):
         if isinstance(langs, str):
             langs = [langs]
-        self.langs = [get_primary_lang_code(lang) for lang in langs]
+        if langs:
+            self.langs = [get_primary_lang_code(lang) for lang in langs]
+            self.default_language = "en" if langs == _SUPPORTED_LANGUAGES \
+                                    else langs[0]
+            self._pop_localized_functions()
+        self.date_time_format = self.DateTimeFormat(self, os.path.join(
+                                                os.path.dirname(__file__),
+                                                'res/text'))
+
+    def _pop_localized_functions(self):
         self._LOCALIZED_FUNCTIONS = populate_localized_function_dict("format",
                                     langs=self.langs)
-        self.date_time_format = self.DateTimeFormat(self, os.path.join(os.path.dirname(__file__),
-                                'res/text'))
 
-    def call_localized_function(self, func_name, lang, arguments):
+
+    def call_localized_function(self, func_name, lang=None, arguments=[]):
+        if not lang:
+            lang = self.default_language
+        if not self.langs:
+            raise ModuleNotFoundError("No formatter modules loaded. Please "
+                                        "initialize the Formatter with at "
+                                        "least one language code, or load "
+                                        "a language using\n"
+                                        "Formatter.load_language(lang_code)")
         return _localized_function_caller("format", self._LOCALIZED_FUNCTIONS,
                                         func_name, lang, arguments)
+
+    def unload_language(self, language):
+        if language in self.langs:
+            self.langs = list(set(self.langs))
+            self.langs.remove(language)
+        if self.langs and self.default_language not in self.langs:
+            self.default_language = self.langs[0]
+            self._pop_localized_functions()
+
+
+    def load_language(self, language):
+        if language in _SUPPORTED_LANGUAGES and language not in self.langs:
+            self.langs.append(language)
+            self._pop_localized_functions()
 
     def _translate_word(self, name, lang):
         """ Helper to get word translations

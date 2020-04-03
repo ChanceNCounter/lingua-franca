@@ -19,7 +19,7 @@ from lingua_franca.time import now_local
 from lingua_franca.lang import get_primary_lang_code
 from lingua_franca.common import populate_localized_function_dict, \
                                  _localized_function_caller, \
-                                 _SUPPORTED_LANGUAGES
+                                 _SUPPORTED_LANGUAGES, UnsupportedLanguageError
 
 _REGISTERED_FUNCTIONS = ["extract_numbers",
                          "extract_number",
@@ -32,16 +32,51 @@ _REGISTERED_FUNCTIONS = ["extract_numbers",
 
 
 class Parser:
+    _LOCALIZED_FUNCTIONS = {}
+    default_language = ""
+    langs = None
+
     def __init__(self, langs=_SUPPORTED_LANGUAGES):
         if isinstance(langs, str):
             langs = [langs]
-        self.langs = [get_primary_lang_code(lang) for lang in langs]
-        self._LOCALIZED_FUNCTIONS = populate_localized_function_dict("parse",
-                                        langs=self.langs)
+        if langs:
+            self.langs = [get_primary_lang_code(lang) for lang in langs]
+            self.default_language = "en" if langs == _SUPPORTED_LANGUAGES \
+                                    else langs[0]
+            self._pop_localized_functions()
+        self._pop_localized_functions()
 
-    def call_localized_function(self, func_name, lang, arguments):
+    def _pop_localized_functions(self):
+        self._LOCALIZED_FUNCTIONS = populate_localized_function_dict("parse",
+                                    langs=self.langs)
+
+
+    def call_localized_function(self, func_name, lang=None, arguments=[]):
+        if not lang:
+            lang = self.default_language
+        if not self.langs:
+            raise ModuleNotFoundError("No parser modules loaded. Please "
+                                        "initialize the parser with at "
+                                        "least one language code, or load "
+                                        "a language using\n"
+                                        "parser.load_language(lang_code)")
         return _localized_function_caller("parse", self._LOCALIZED_FUNCTIONS,
                                         func_name, lang, arguments)
+
+    def unload_language(self, language):
+        if language in self.langs:
+            self.langs = list(set(self.langs))
+            self.langs.remove(language)
+        if self.langs and self.default_language not in self.langs:
+            self.default_language = self.langs[0]
+            self._pop_localized_functions()
+
+
+    def load_language(self, language):
+        if language in _SUPPORTED_LANGUAGES and language not in self.langs:
+            self.langs.append(language)
+            self._pop_localized_functions()
+
 
     def fuzzy_match(self, x, against):
         """Perform a 'fuzzy' comparison between two strings.
