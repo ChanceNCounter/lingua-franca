@@ -5,13 +5,17 @@ from warnings import warn
 
 from lingua_franca.lang import get_primary_lang_code
 
-_SUPPORTED_LANGUAGES = ["da", "de", "en", "es", "fr", "hu",
+_SUPPORTED_LANGUAGES = ["cs", "da", "de", "en", "es", "fr", "hu",
                         "it", "nl", "pt", "sv"]
+
+
 class UnsupportedLanguageError(NotImplementedError):
     pass
 
+
 class FunctionNotLocalizedError(NotImplementedError):
     pass
+
 
 def raise_unsupported_language(language):
     """
@@ -23,9 +27,10 @@ def raise_unsupported_language(language):
     """
     supported = ' '.join(_SUPPORTED_LANGUAGES)
     raise UnsupportedLanguageError("\nLanguage '{language}' is not yet "
-                "supported by Lingua Franca. Supported language codes "
-                "include the following:\n{supported}"
-                .format(language=language, supported=supported))
+                                   "supported by Lingua Franca. Supported language codes "
+                                   "include the following:\n{supported}"
+                                   .format(language=language, supported=supported))
+
 
 def _localized_function_caller(mod, funcs, func_name, lang, args):
     """Calls a localized function from a dictionary populated by
@@ -50,24 +55,25 @@ def _localized_function_caller(mod, funcs, func_name, lang, args):
     if lang_code not in _SUPPORTED_LANGUAGES:
         raise_unsupported_language(lang_code)
     elif lang_code not in funcs.keys():
-        raise ModuleNotFoundError(mod + " module of language '" + \
-                                    lang_code +  "' is not currently loaded.")
+        raise ModuleNotFoundError(mod + " module of language '" +
+                                  lang_code + "' is not currently loaded.")
     func_signature = funcs[lang_code][func_name]
     if not func_signature:
         raise KeyError("Something is very wrong with Lingua Franca."
-                        " Have you altered the library? If not, please"
-                        " contact the developers through GitHub.")
+                       " Have you altered the library? If not, please"
+                       " contact the developers through GitHub.")
     elif isinstance(func_signature, type(NotImplementedError())):
         raise func_signature
     else:
         _module = import_module(".lang." + mod + "_" + lang_code,
-                             "lingua_franca")
+                                "lingua_franca")
         func = getattr(_module, func_name + "_" + lang_code)
         r_val = func(**{arg: val for arg, val in args if arg in
-                    func_signature.parameters})
+                        func_signature.parameters})
         del func
         del _module
         return r_val
+
 
 def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
     """Returns a dictionary of dictionaries, containing localized functions.
@@ -76,10 +82,10 @@ def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
 
     Arguments:
         lf_module (str) -- the name of the top-level module
-    
+
     Returns:
         Dict -- {language_code : {function_name (str) : function}}
-    
+
     Example:
         populate_localized_function_dict("format")["en"]["pronounce_number"](1)
         "one"
@@ -93,9 +99,9 @@ def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
         _FUNCTION_NOT_FOUND = ""
         try:
             lang_common_data = import_module(".lang.common_data_" + lang_code,
-                                        "lingua_franca")
+                                             "lingua_franca")
             _FUNCTION_NOT_FOUND = getattr(lang_common_data,
-                                     "_FUNCTION_NOT_IMPLEMENTED_WARNING")
+                                          "_FUNCTION_NOT_IMPLEMENTED_WARNING")
             del lang_common_data
         except Exception:
             _FUNCTION_NOT_FOUND = "This function has not been implemented" \
@@ -110,11 +116,11 @@ def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
             continue
 
         function_names = getattr(import_module("." + lf_module, "lingua_franca"),
-                                "_REGISTERED_FUNCTIONS")
+                                 "_REGISTERED_FUNCTIONS")
         for function_name in function_names:
             try:
                 function = getattr(mod, function_name
-                                                + "_" + lang_code)
+                                   + "_" + lang_code)
                 function_signature = signature(function)
                 del function
             except AttributeError:
@@ -128,6 +134,7 @@ def populate_localized_function_dict(lf_module, langs=_SUPPORTED_LANGUAGES):
 
         del mod
     return return_dict
+
 
 def resolve_resource_file(res_name, data_dir=None):
     """Convert a resource into an absolute filename.
