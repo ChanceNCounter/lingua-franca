@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# VSCod(e/ium)
+.vscode/
+vscode/
+*.code-workspace
