@@ -17,9 +17,9 @@ from lingua_franca.common import raise_unsupported_language
 from difflib import SequenceMatcher
 from warnings import warn
 from lingua_franca.time import now_local
-from lingua_franca.lang import get_primary_lang_code
-from lingua_franca.common import populate_localized_function_dict, \
-    _localized_function_caller
+from lingua_franca.common import localized_function_caller, \
+    populate_localized_function_dict, get_active_langs, \
+    get_full_lang_code, get_primary_lang_code, get_default_lang
 
 _REGISTERED_FUNCTIONS = ["extract_numbers",
                          "extract_number",
@@ -30,12 +30,12 @@ _REGISTERED_FUNCTIONS = ["extract_numbers",
                          "is_fractional",
                          "is_ordinal"]
 
-_LOCALIZED_FUNCTIONS = populate_localized_function_dict("parse")
+populate_localized_function_dict("parse", langs=get_active_langs())
 
 
 def call_localized_function(func_name, lang, arguments):
-    return _localized_function_caller("parse", _LOCALIZED_FUNCTIONS,
-                                      func_name, lang, arguments)
+    return localized_function_caller("parse",
+                                     func_name, lang, arguments)
 
 
 def fuzzy_match(x, against):

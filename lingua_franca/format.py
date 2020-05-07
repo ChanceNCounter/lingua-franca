@@ -13,20 +13,21 @@
 # limitations under the License.
 #
 
-from os.path import join
-
-from lingua_franca.lang import get_full_lang_code, get_primary_lang_code
-
-from lingua_franca.common import _localized_function_caller, populate_localized_function_dict
-from lingua_franca.bracket_expansion import SentenceTreeParser
-
+import datetime
+import json
+import os
+import re
 from collections import namedtuple
 from inspect import signature
 from warnings import warn
-import json
-import os
-import datetime
-import re
+from os.path import join
+
+
+from lingua_franca.bracket_expansion import SentenceTreeParser
+from lingua_franca.common import localized_function_caller, \
+    populate_localized_function_dict, get_active_langs, \
+    get_full_lang_code, get_primary_lang_code, get_default_lang
+
 
 _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_time",
@@ -35,19 +36,19 @@ _REGISTERED_FUNCTIONS = ["nice_number",
                          "nice_ordinal",
                          "nice_part_of_day"]
 
-_LOCALIZED_FUNCTIONS = populate_localized_function_dict("format")
+populate_localized_function_dict("format", langs=get_active_langs())
 
 
-def call_localized_function(func_name, lang, arguments):
-    return _localized_function_caller("format", _LOCALIZED_FUNCTIONS,
-                                      func_name, lang, arguments)
+def call_localized_function(func_name, lang=get_default_lang(), arguments={}):
+    return localized_function_caller("format",
+                                     func_name, lang, arguments)
 
 
 def _translate_word(name, lang):
     """ Helper to get word translations
 
     Args:
-        name (str): Word name. Returned as the default value if not translated.
+        name (str): Word name. Returned as the default value if not translated
         lang (str): Language code, e.g. "en-us"
 
     Returns:

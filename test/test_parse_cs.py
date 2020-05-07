@@ -16,7 +16,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from lingua_franca.lang import get_active_lang, set_active_lang
+from lingua_franca.common import get_active_lang, set_active_lang
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_duration
 from lingua_franca.parse import extract_number, extract_numbers

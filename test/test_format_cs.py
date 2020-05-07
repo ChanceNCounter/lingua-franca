@@ -20,7 +20,7 @@ import ast
 import sys
 from pathlib import Path
 
-from lingua_franca.lang import get_active_lang, set_active_lang
+from lingua_franca.common import get_active_lang, set_active_lang
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import nice_date
@@ -73,7 +73,7 @@ class TestNiceNumberFormat(unittest.TestCase):
 
     def test_convert_float_to_nice_number(self):
         for number, number_str in NUMBERS_FIXTURE_CS.items():
-            self.assertEqual(nice_number(number,speech=True), number_str,
+            self.assertEqual(nice_number(number, speech=True), number_str,
                              'měl by zformátovat {} jako {}, ne {}'.format(
                                  number, number_str, nice_number(number, speech=True)))
 
@@ -203,12 +203,12 @@ class TestPronounceNumber(unittest.TestCase):
                                         "mocninu záporné jedna sto "
                                         "a padesát")
         # value is platform dependent so better not use in tests?
-        #self.assertEqual(
+        # self.assertEqual(
         #    pronounce_number(sys.float_info.min), "dva tečka dva dva times "
         #                                          "ten na mocninu "
         #                                          "negative tři sto "
         #                                          "a osm")
-        #self.assertEqual(
+        # self.assertEqual(
         #    pronounce_number(sys.float_info.max), "jedna tečka sedm devět "
         #                                          "krát deset na mocninu"
         #                                          " tři sto a osm")
@@ -242,7 +242,7 @@ class TestPronounceNumber(unittest.TestCase):
         self.assertEqual(
             pronounce_number(1000001, short_scale=True),
             "jedna million, jedna")
-        self.assertEqual(pronounce_number(95505896639631893,short_scale=True),
+        self.assertEqual(pronounce_number(95505896639631893, short_scale=True),
                          "devadesát pět quadrillion, pět sto a pět "
                          "trillion, osm sto a devadesát šest billion, šest "
                          "sto a třicet devět million, šest sto a "
@@ -371,6 +371,8 @@ class TestPronounceNumber(unittest.TestCase):
 
 # def nice_time(dt, lang="en-us", speech=True, use_24hour=False,
 #              use_ampm=False):
+
+
 class TestNiceDateFormat(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -383,6 +385,7 @@ class TestNiceDateFormat(unittest.TestCase):
                       str(sub_dir / 'date_time_test.json'))
                 with (sub_dir / 'date_time_test.json').open() as f:
                     cls.test_config[sub_dir.parts[-1]] = json.loads(f.read())
+
     def setUp(self):
         self.old_lang = get_active_lang()
         set_active_lang("cs-cz")
@@ -533,15 +536,15 @@ class TestNiceDateFormat(unittest.TestCase):
 
         # test fall back to english !!!Skiped
         #dt = datetime.datetime(2018, 2, 4, 0, 2, 3)
-        #self.assertEqual(nice_date(
+        # self.assertEqual(nice_date(
         #    dt, lang='invalid', now=datetime.datetime(2018, 2, 4, 0, 2, 3)),
         #    'today')
 
         # test all days in a year for all languages,
         # that some output is produced
-        #for lang in self.test_config:
+        # for lang in self.test_config:
         for dt in (datetime.datetime(2017, 12, 30, 0, 2, 3) +
-            datetime.timedelta(n) for n in range(368)):
+                   datetime.timedelta(n) for n in range(368)):
             self.assertTrue(len(nice_date(dt, lang=lang)) > 0)
 
     def test_nice_date_time(self):
@@ -565,8 +568,6 @@ class TestNiceDateFormat(unittest.TestCase):
                         use_24hour=ast.literal_eval(p['use_24hour']),
                         use_ampm=ast.literal_eval(p['use_ampm'])))
                 i = i + 1
-                
-        
 
     def test_nice_year(self):
         for lang in self.test_config:
@@ -594,7 +595,7 @@ class TestNiceDateFormat(unittest.TestCase):
 
 #                print(nice_year(dt, lang=lang))
     def test_nice_duration(self):
-        
+
         self.assertEqual(nice_duration(1), "jedna sekunda")
         self.assertEqual(nice_duration(3), "tři sekundy")
         self.assertEqual(nice_duration(1, speech=False), "0:01")
@@ -623,8 +624,10 @@ class TestNiceDateFormat(unittest.TestCase):
 
         self.assertEqual(join_list(["a", "b", "c"], "a"), "a, b a c")
         self.assertEqual(join_list(["a", "b", "c"], "nebo"), "a, b nebo c")
-        self.assertEqual(join_list(["a", "b", "c"], "nebo", ";"), "a; b nebo c")
-        self.assertEqual(join_list(["a", "b", "c", "d"], "nebo"), "a, b, c nebo d")
+        self.assertEqual(
+            join_list(["a", "b", "c"], "nebo", ";"), "a; b nebo c")
+        self.assertEqual(
+            join_list(["a", "b", "c", "d"], "nebo"), "a, b, c nebo d")
 
         self.assertEqual(join_list([1, "b", 3, "d"], "nebo"), "1, b, 3 nebo d")
 

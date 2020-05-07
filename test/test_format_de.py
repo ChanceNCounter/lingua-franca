@@ -16,7 +16,7 @@
 import unittest
 import datetime
 
-from lingua_franca.lang import get_active_lang, set_active_lang
+from lingua_franca.common import get_active_lang, set_active_lang
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
