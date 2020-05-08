@@ -6,7 +6,25 @@ from warnings import warn
 _SUPPORTED_LANGUAGES = ["cs", "da", "de", "en", "es", "fr", "hu",
                         "it", "nl", "pt", "sv"]
 
-__default_lang = "en-us"  # English is the default active language
+_SUPPORTED_FULL_LOCALIZATIONS = ["cs-cz", "da-dk", "de-de", "en-au", "en-us",
+                                 "es-es", "fr-fr", "hu-hu", "it-it", "nl-nl",
+                                 "pt-pt", "ru-ru", "sv-se", "tr-tr"]
+
+_DEFAULT_FULL_LANG_CODES = {'cs': 'cs-cz',
+                            'da': 'da-dk',
+                            'de': 'de-de',
+                            'en': 'en-us',
+                            'es': 'es-es',
+                            'fr': 'fr-fr',
+                            'hu': 'hu-hu',
+                            'it': 'it-it',
+                            'nl': 'pt-pt',
+                            'ru': 'ru-ru',
+                            'sv': 'sv-se',
+                            'tr': 'tr-tr'}
+
+__default_lang = "en"  # English is the default active language
+__active_lang_code = "en-us"
 __loaded_langs = [i for i in _SUPPORTED_LANGUAGES]
 
 _localized_functions = {}
@@ -32,7 +50,6 @@ def set_active_langs(langs, override_default=True):
     if not isinstance(langs, list):
         raise(TypeError("lingua_franca.common.set_active_langs expects"
                         " 'str' or 'list'"))
-    langs = [get_primary_lang_code(lang) for lang in langs]
     global __loaded_langs
     __loaded_langs = list(dict.fromkeys(langs))
     if override_default or get_primary_lang_code(__default_lang) \
@@ -44,6 +61,10 @@ def set_active_langs(langs, override_default=True):
 def _refresh_function_dict():
     for mod in _localized_functions.keys():
         populate_localized_function_dict(mod, langs=__loaded_langs)
+
+
+def is_supported_full_lang(lang):
+    return lang in _SUPPORTED_FULL_LOCALIZATIONS
 
 
 def get_active_langs():
@@ -60,35 +81,70 @@ def load_language(lang):
         __loaded_langs.append(lang)
 
 
+def unload_language(lang):
+    if lang in __loaded_langs:
+        __loaded_langs.remove(lang)
+        set_active_langs(__loaded_langs)
+
+
 def get_default_lang():
-    """ Get the active full language code (BCP-47)
+    """ Return the current default language.
+        This returns the active language *family*' such as 'en' or 'es'.
+        For the current localization/full language code, call
+        `get_default_loc()`
 
     Returns:
-        str: A BCP-47 language code, e.g. ("en-us", or "pt-pt")
+        str: A primary language code, e.g. ("en", or "pt")
     """
     return __default_lang
 
 
+def get_default_loc():
+    """ Return the current, localized BCP-47 language code, such as 'en-US'
+        or 'es-ES'. For the default language *family* - which is passed to
+        most parsers and formatters - call `get_default_lang`
+    """
+    return __active_lang_code
+
+
 def set_default_lang(lang_code):
     """ Set the active BCP-47 language code to be used in formatting/parsing
+        Will choose a default localization if passed a primary language family
+        (ex: `set_default_lang("en")` will default to "en-US")
+
+        Will respect localization when passed a full lang code.
 
     Args:
-        lang (str): BCP-47 language code, e.g. "en-us" or "es-mx"
+        lang(str): BCP-47 language code, e.g. "en-us" or "es-mx"
     """
     global __default_lang
-    if __default_lang != lang_code:
-        # TODO: Validate lang codes?
-        __default_lang = lang_code
-    if __default_lang not in __loaded_langs:
-        __loaded_langs.insert(0, __default_lang)
-        _refresh_function_dict()
+    global __active_lang_code
+
+    primary_lang_code = get_primary_lang_code(lang_code)
+    if (__default_lang != primary_lang_code and
+            primary_lang_code in _SUPPORTED_LANGUAGES):
+        __default_lang = primary_lang_code
+    else:
+        raise_unsupported_language(lang_code)
+
+    # make sure the default language is loaded.
+    # also make sure the default language is at the front.
+    # position doesn't matter here, but it clarifies things while debugging.
+    if __default_lang in __loaded_langs:
+        __loaded_langs.remove(__default_lang)
+    __loaded_langs.insert(0, __default_lang)
+    _refresh_function_dict()
+
+    __active_lang_code = get_full_lang_code(__default_lang)
 
 
 def get_primary_lang_code(lang=None):
     """ Get the primary language code
 
     Args:
-        lang (str, optional): A BCP-47 language code, or None for default
+        lang(str, optional): A BCP-47 language code
+                              (If omitted, equivalent to
+                              `lingua_franca.get_default_lang()`)
 
     Returns:
         str: A primary language family, such as "en", "de" or "pt"
@@ -98,22 +154,47 @@ def get_primary_lang_code(lang=None):
     #       1, 2, 3 and 4 character codes.  In the future we can consider
     #       mapping from the 3 to 2 character codes, for example.  But for
     #       now we can just be careful in use.
-    return get_full_lang_code(lang).split("-")[0]
+    if not lang:
+        return get_default_lang()
+    elif not isinstance(lang, str):
+        raise(TypeError("lingua_franca.get_primary_lang_code() expects"
+                        " an (optional)argument of type 'str', but got " +
+                        type(lang)))
+    else:
+        lang_code = lang.lower()
+    if lang_code not in _SUPPORTED_FULL_LOCALIZATIONS and lang_code not in \
+            _SUPPORTED_LANGUAGES:
+        # We don't know this language code. Check if the input is
+        # formatted like a language code.
+        if lang == (("-".join([lang[:2], lang[3:]]) or None)):
+            warn("Unrecognized language code: '" + lang + "', but it appears"
+                 "to be a valid language code. Returning the first two chars.")
+            return lang_code.split("-")[0]
+        else:
+            raise(ValueError("Invalid input: " + lang))
+    return lang_code.split("-")[0]
 
 
 def get_full_lang_code(lang=None):
     """ Get the full language code
 
     Args:
-        lang (str, optional): A BCP-47 language code, or None for default
+        lang(str, optional): A BCP-47 language code
+                              (if omitted, equivalent to
+                               `lingua_franca.get_default_loc()`)
 
     Returns:
         str: A full language code, such as "en-us" or "de-de"
     """
-    if not lang:
-        lang = __default_lang
+    if lang is None:
+        return __active_lang_code.lower()
 
-    return lang or "en-us"
+    if lang.lower() in _SUPPORTED_FULL_LOCALIZATIONS:
+        return lang
+    elif lang in _DEFAULT_FULL_LANG_CODES:
+        return _DEFAULT_FULL_LANG_CODES[lang]
+    else:
+        return "en-us"
 
 
 class UnsupportedLanguageError(NotImplementedError):
@@ -144,11 +225,11 @@ def localized_function_caller(mod, func_name, lang, args):
         `populate_localized_function_dict()`
 
     Arguments:
-        mod (str): the module calling this function
-        func_name (str): the name of the function to find and call
+        mod(str): the module calling this function
+        func_name(str): the name of the function to find and call
                 (e.g. "pronounce_number")
-        lang (str): a language code
-        arguments (dict): the arguments to pass to the localized function
+        lang(str): a language code
+        arguments(dict): the arguments to pass to the localized function
 
     Returns:
         Result of localized function
@@ -197,10 +278,19 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
     Used by the top-level modules to locate, cache, and call localized functions.
 
     Arguments:
-        lf_module (str) -- the name of the top-level module
+        lf_module(str) - - the name of the top-level module
 
     Returns:
-        Dict -- {language_code : {function_name (str) : function}}
+        Dict - - {language_code: {function_name(str): function}}
+
+    Note:
+        The dictionary returned can be used directly,
+        but it's normally discarded. Rather, this function will create
+        the dictionary as a member of
+        `lingua_franca.common._localized_functions`,
+        and its members are invoked via `call_localized_function()`.
+
+        The dictionary is returned for 
 
     Example:
         populate_localized_function_dict("format")["en"]["pronounce_number"](1)
@@ -211,10 +301,11 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
                     " could not be found."
     return_dict = {}
     for lang_code in langs:
-        return_dict[lang_code] = {}
+        primary_lang_code = get_primary_lang_code(lang_code)
+        return_dict[primary_lang_code] = {}
         _FUNCTION_NOT_FOUND = ""
         try:
-            lang_common_data = import_module(".lang.common_data_" + lang_code,
+            lang_common_data = import_module(".lang.common_data_" + primary_lang_code,
                                              "lingua_franca")
             _FUNCTION_NOT_FOUND = getattr(lang_common_data,
                                           "_FUNCTION_NOT_IMPLEMENTED_WARNING")
@@ -225,10 +316,10 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
         _FUNCTION_NOT_FOUND = FunctionNotLocalizedError(_FUNCTION_NOT_FOUND)
 
         try:
-            mod = import_module(".lang." + lf_module + "_" + lang_code,
+            mod = import_module(".lang." + lf_module + "_" + primary_lang_code,
                                 "lingua_franca")
         except ModuleNotFoundError:
-            warn(Warning(bad_lang_code.format(lang_code)))
+            warn(Warning(bad_lang_code.format(primary_lang_code)))
             continue
 
         function_names = getattr(import_module("." + lf_module, "lingua_franca"),
@@ -236,13 +327,13 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
         for function_name in function_names:
             try:
                 function = getattr(mod, function_name
-                                   + "_" + lang_code)
+                                   + "_" + primary_lang_code)
                 function_signature = signature(function)
                 del function
             except AttributeError:
                 function_signature = _FUNCTION_NOT_FOUND
                 # TODO log these occurrences: "function 'function_name' not
-                # implemented in language 'lang_code'"
+                # implemented in language 'primary_lang_code'"
                 #
                 # Perhaps provide this info to autodocs, to help volunteers
                 # identify the functions in need of localization
@@ -260,7 +351,7 @@ def resolve_resource_file(res_name, data_dir=None):
     or 'path/filename.ext'
 
     The system wil look for ~/.mycroft/res_name first, and
-    if not found will look at /opt/mycroft/res_name,
+    if not found will look at / opt/mycroft/res_name,
     then finally it will look for res_name in the 'mycroft/res'
     folder of the source code package.
 
@@ -273,7 +364,7 @@ def resolve_resource_file(res_name, data_dir=None):
     been installed.
 
     Args:
-        res_name (str): a resource path/name
+        res_name(str): a resource path/name
     Returns:
         str: path to resource or None if no resource found
     """

@@ -20,7 +20,7 @@ import ast
 import sys
 from pathlib import Path
 
-from lingua_franca.common import get_active_lang, set_active_lang
+from lingua_franca import get_default_lang, set_default_lang
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import nice_date
@@ -65,11 +65,11 @@ NUMBERS_FIXTURE_CS = {
 
 class TestNiceNumberFormat(unittest.TestCase):
     def setUp(self):
-        self.old_lang = get_active_lang()
-        set_active_lang("cs-cz")
+        self.old_lang = get_default_lang()
+        set_default_lang("cs-cz")
 
     def tearDown(self):
-        set_active_lang(self.old_lang)
+        set_default_lang(self.old_lang)
 
     def test_convert_float_to_nice_number(self):
         for number, number_str in NUMBERS_FIXTURE_CS.items():
@@ -97,22 +97,14 @@ class TestNiceNumberFormat(unittest.TestCase):
                          'měl by zformátovat 6.0 jako 6 ne {}'.format(
                              nice_number(6.0, speech=False)))
 
-    def test_unknown_language(self):
-        """ An unknown / unhandled language should return the string
-            representation of the input number.
-        """
-        self.assertEqual(nice_number(5.5, speech=False, lang='as-fd'), '5.5',
-                         'měl by zformátovat 5.5 as 5.5 not {}'.format(
-                             nice_number(5.5, speech=False, lang='as-df')))
-
 
 class TestPronounceNumber(unittest.TestCase):
     def setUp(self):
-        self.old_lang = get_active_lang()
-        set_active_lang("cs-cz")
+        self.old_lang = get_default_lang()
+        set_default_lang("cs-cz")
 
     def tearDown(self):
-        set_active_lang(self.old_lang)
+        set_default_lang(self.old_lang)
 
     def test_convert_int(self):
         self.assertEqual(pronounce_number(0), "nula")
@@ -387,11 +379,11 @@ class TestNiceDateFormat(unittest.TestCase):
                     cls.test_config[sub_dir.parts[-1]] = json.loads(f.read())
 
     def setUp(self):
-        self.old_lang = get_active_lang()
-        set_active_lang("cs-cz")
+        self.old_lang = get_default_lang()
+        set_default_lang("cs-cz")
 
     def tearDown(self):
-        set_active_lang(self.old_lang)
+        set_default_lang(self.old_lang)
 
     def test_convert_times(self):
         dt = datetime.datetime(2017, 1, 31,

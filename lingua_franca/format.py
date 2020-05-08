@@ -26,7 +26,8 @@ from os.path import join
 from lingua_franca.bracket_expansion import SentenceTreeParser
 from lingua_franca.common import localized_function_caller, \
     populate_localized_function_dict, get_active_langs, \
-    get_full_lang_code, get_primary_lang_code, get_default_lang
+    get_full_lang_code, get_primary_lang_code, get_default_lang, \
+    get_default_loc, is_supported_full_lang
 
 
 _REGISTERED_FUNCTIONS = ["nice_number",
@@ -44,7 +45,7 @@ def call_localized_function(func_name, lang=get_default_lang(), arguments={}):
                                      func_name, lang, arguments)
 
 
-def _translate_word(name, lang):
+def _translate_word(name, lang=None):
     """ Helper to get word translations
 
     Args:
@@ -55,8 +56,11 @@ def _translate_word(name, lang):
         str: translated version of resource name
     """
     from lingua_franca.common import resolve_resource_file
+    if not lang:
+        lang = get_default_loc()
 
-    lang_code = get_full_lang_code(lang)
+    lang_code = lang if is_supported_full_lang(lang) else \
+        get_full_lang_code(lang)
 
     filename = resolve_resource_file(join("text", lang_code, name+".word"))
     if filename:
@@ -402,6 +406,11 @@ def nice_duration(duration, lang=None, speech=True):
     Returns:
         str: timespan as a string
     """
+    if not lang:
+        lang = get_default_loc()
+    if not is_supported_full_lang(lang):
+        lang = get_full_lang_code(lang)
+
     if type(duration) is datetime.timedelta:
         duration = duration.total_seconds()
 

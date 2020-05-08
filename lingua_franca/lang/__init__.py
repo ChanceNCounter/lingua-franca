@@ -64,7 +64,7 @@ def get_primary_lang_code(lang=None):
     #       now we can just be careful in use.
     warn("Direct imports from lingua_franca.lang have been deprecated. Use"
          " lingua_franca.common.get_primary_lang_code()", DeprecationWarning)
-    return gflc(lang=lang)
+    return gplc(lang=lang)
 
 
 def get_full_lang_code(lang=None):
