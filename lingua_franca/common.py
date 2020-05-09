@@ -30,7 +30,7 @@ __loaded_langs = [i for i in _SUPPORTED_LANGUAGES]
 _localized_functions = {}
 
 
-def set_active_langs(langs, override_default=True):
+def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
     """ Set the list of languages to load.
         Unloads previously-loaded languages which are not specified here.
         If the input list does not contain the current default language,
@@ -121,11 +121,10 @@ def set_default_lang(lang_code):
     global __active_lang_code
 
     primary_lang_code = get_primary_lang_code(lang_code)
-    if (__default_lang != primary_lang_code and
-            primary_lang_code in _SUPPORTED_LANGUAGES):
-        __default_lang = primary_lang_code
-    else:
+    if primary_lang_code not in _SUPPORTED_LANGUAGES:
         raise_unsupported_language(lang_code)
+    else:
+        __default_lang = primary_lang_code
 
     # make sure the default language is loaded.
     # also make sure the default language is at the front.
