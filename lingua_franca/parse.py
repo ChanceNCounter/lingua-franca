@@ -21,14 +21,14 @@ from lingua_franca.common import localized_function_caller, \
     populate_localized_function_dict, get_active_langs, \
     get_full_lang_code, get_primary_lang_code, get_default_lang
 
-_REGISTERED_FUNCTIONS = ["extract_numbers",
+_REGISTERED_FUNCTIONS = ("extract_numbers",
                          "extract_number",
                          "extract_duration",
                          "extract_datetime",
                          "normalize",
                          "get_gender",
                          "is_fractional",
-                         "is_ordinal"]
+                         "is_ordinal")
 
 populate_localized_function_dict("parse", langs=get_active_langs())
 
@@ -94,7 +94,7 @@ def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
     try:
         return call_localized_function("extract_numbers", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return []
 
 
@@ -116,7 +116,7 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
     try:
         return call_localized_function("extract_number", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return text
 
 
@@ -150,7 +150,7 @@ def extract_duration(text, lang=None):
         return call_localized_function("extract_duration", lang,
                                        locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return None
 
 
@@ -210,7 +210,7 @@ def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
         return call_localized_function("extract_datetime", lang,
                                        locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return text
 
 
@@ -233,7 +233,7 @@ def normalize(text, lang=None, remove_articles=True):
     try:
         return call_localized_function("normalize", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return text
 
 
@@ -255,7 +255,7 @@ def get_gender(word, context="", lang=None):
     try:
         return call_localized_function("get_gender", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return None
 
 

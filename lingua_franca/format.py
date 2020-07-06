@@ -30,12 +30,10 @@ from lingua_franca.common import localized_function_caller, \
     get_default_loc, is_supported_full_lang
 
 
-_REGISTERED_FUNCTIONS = ["nice_number",
+_REGISTERED_FUNCTIONS = ("nice_number",
                          "nice_time",
                          "pronounce_number",
-                         "nice_response",
-                         "nice_ordinal",
-                         "nice_part_of_day"]
+                         "nice_response")
 
 populate_localized_function_dict("format", langs=get_active_langs())
 
@@ -263,7 +261,7 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     try:
         r_val = call_localized_function("nice_number", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return str(number)
     return r_val
 
@@ -289,7 +287,7 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
     try:
         r_val = call_localized_function("nice_time", lang, locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return str(dt)
     return r_val
 
@@ -314,7 +312,7 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
         r_val = call_localized_function("pronounce_number", lang,
                                         locals().items())
     except NotImplementedError as e:
-        warn(e.__str__())
+        warn(str(e))
         return str(number)
     return r_val
 
@@ -411,7 +409,7 @@ def nice_duration(duration, lang=None, speech=True):
     if not is_supported_full_lang(lang):
         lang = get_full_lang_code(lang)
 
-    if type(duration) is datetime.timedelta:
+    if isinstance(duration, datetime.timedelta):
         duration = duration.total_seconds()
 
     # Do traditional rounding: 2.5->3, 3.5->4, plus this
@@ -537,19 +535,23 @@ def expand_options(parentheses_line: str) -> list:
 
 
 def nice_response(text, lang=None):
+    """
+    In some languages, sanitizes certain numeric input for TTS
+
+    Most of the time, this function will be called by any formatters
+    which might need it. It's exposed here just in case you've got a clever
+    use.
+
+    As of July 2020, this function sanitizes some dates and "x ^ y"-formatted
+    exponents in the following primary language codes:
+      da de nl sv
+
+    Example:
+        assertEqual(nice_response_de("dies ist der 31. mai"),
+                         "dies ist der einunddreißigste mai")
+
+        assertEqual(nice_response_de("10 ^ 2"),
+                         "10 hoch 2")
+    """
     return call_localized_function("nice_response", lang,
                                    locals().items()) or text
-
-
-def nice_ordinal(text, speech=True, lang=None):
-    return call_localized_function("nice_ordinal", lang, locals().items()) \
-        or text
-
-
-def nice_part_of_day(dt, speech=True, lang=None):
-    r_val = call_localized_function("nice_part_of_day", lang, locals().items())
-    if not r_val:
-        raise NotImplementedError(
-            "nice_part_of_day() is not implemented in " + lang)
-    else:
-        return r_val

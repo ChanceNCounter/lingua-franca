@@ -300,13 +300,13 @@ def nice_time_da(dt, speech=True, use_24hour=False, use_ampm=False):
 
 
 def nice_response_da(text):
-    # check for months and call nice_ordinal_da declension of ordinals
+    # check for months and call _nice_ordinal_da declension of ordinals
     # replace "^" with "hoch" (to the power of)
     words = text.split()
 
     for idx, word in enumerate(words):
         if word.lower() in _MONTHS_DA:
-            text = nice_ordinal_da(text)
+            text = _nice_ordinal_da(text)
 
         if word == '^':
             wordNext = words[idx + 1] if idx + 1 < len(words) else ""
@@ -316,7 +316,7 @@ def nice_response_da(text):
     return text
 
 
-def nice_ordinal_da(text, speech=True):
+def _nice_ordinal_da(text, speech=True):
     # check for months for declension of ordinals before months
     # depending on articles/prepositions
     normalized_text = text
@@ -337,4 +337,3 @@ def nice_ordinal_da(text, speech=True):
                     words[idx] = word
             normalized_text = " ".join(words)
     return normalized_text
-

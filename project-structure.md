@@ -40,22 +40,20 @@ Ensure that all supported languages are registered in `lingua_franca.common.py`,
 ## On writing new functions which will need localization
 
 Ensure that all functions which will have localized versions are registered in their module's
-`_REGISTERED_FUNCTIONS` list, conventionally defined near the top.
+`_REGISTERED_FUNCTIONS` tuple, conventionally defined near the top.
 
 For example, formatters which have been or will be localized are registered in
   `lingua_franca.format._REGISTERED_FUNCTIONS`, by name only.
 
-As of March, 2020, this list looks as follows:
+As of July, 2020, this tuple looks as follows:
 
   ```python3
   # lingua_franca/format.py
 
-  _REGISTERED_FUNCTIONS = ["nice_number",
+  _REGISTERED_FUNCTIONS = ("nice_number",
                          "nice_time",
                          "pronounce_number",
-                         "nice_response",
-                         "nice_ordinal",
-                         "nice_part_of_day"]
+                         "nice_response")
   ```
 
 ## On localizing functions

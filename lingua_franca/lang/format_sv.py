@@ -144,7 +144,8 @@ def pronounce_number_sv(number, places=2, short_scale=True, scientific=False,
             elif scale_level == 1:
                 result += 'ettusen' + _EXTRA_SPACE_SV
             else:
-                result += 'en ' + _NUM_POWERS_OF_TEN_SV[scale_level] + _EXTRA_SPACE_SV
+                result += 'en ' + \
+                    _NUM_POWERS_OF_TEN_SV[scale_level] + _EXTRA_SPACE_SV
         elif last_triplet > 1:
             result += pronounce_triplet_sv(last_triplet)
             if scale_level == 1:
@@ -336,13 +337,13 @@ def nice_time_sv(dt, speech=True, use_24hour=False, use_ampm=False):
 
 
 def nice_response_sv(text):
-    # check for months and call nice_ordinal_sv declension of ordinals
+    # check for months and call _nice_ordinal_sv declension of ordinals
     # replace "^" with "hoch" (to the power of)
     words = text.split()
 
     for idx, word in enumerate(words):
         if word.lower() in _MONTHS_SV:
-            text = nice_ordinal_sv(text)
+            text = _nice_ordinal_sv(text)
 
         if word == '^':
             wordNext = words[idx + 1] if idx + 1 < len(words) else ""
@@ -352,7 +353,7 @@ def nice_response_sv(text):
     return text
 
 
-def nice_ordinal_sv(text, speech=True):
+def _nice_ordinal_sv(text, speech=True):
     # check for months for declension of ordinals before months
     # depending on articles/prepositions
     normalized_text = text

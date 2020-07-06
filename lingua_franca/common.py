@@ -3,12 +3,12 @@ from importlib import import_module
 from inspect import signature
 from warnings import warn
 
-_SUPPORTED_LANGUAGES = ["cs", "da", "de", "en", "es", "fr", "hu",
-                        "it", "nl", "pt", "sv"]
+_SUPPORTED_LANGUAGES = ("cs", "da", "de", "en", "es", "fr", "hu",
+                        "it", "nl", "pt", "sv")
 
-_SUPPORTED_FULL_LOCALIZATIONS = ["cs-cz", "da-dk", "de-de", "en-au", "en-us",
+_SUPPORTED_FULL_LOCALIZATIONS = ("cs-cz", "da-dk", "de-de", "en-au", "en-us",
                                  "es-es", "fr-fr", "hu-hu", "it-it", "nl-nl",
-                                 "pt-pt", "ru-ru", "sv-se", "tr-tr"]
+                                 "pt-pt", "ru-ru", "sv-se", "tr-tr")
 
 _DEFAULT_FULL_LANG_CODES = {'cs': 'cs-cz',
                             'da': 'da-dk',
@@ -64,7 +64,7 @@ def _refresh_function_dict():
 
 
 def is_supported_full_lang(lang):
-    return lang in _SUPPORTED_FULL_LOCALIZATIONS
+    return lang.lower() in _SUPPORTED_FULL_LOCALIZATIONS
 
 
 def get_active_langs():
@@ -134,7 +134,10 @@ def set_default_lang(lang_code):
     __loaded_langs.insert(0, __default_lang)
     _refresh_function_dict()
 
-    __active_lang_code = get_full_lang_code(__default_lang)
+    if is_supported_full_lang(lang_code.lower()):
+        __active_lang_code = lang_code.lower()
+    else:
+        __active_lang_code = get_full_lang_code(__default_lang)
 
 
 def get_primary_lang_code(lang=None):
