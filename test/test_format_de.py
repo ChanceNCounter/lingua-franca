@@ -16,7 +16,7 @@
 import unittest
 import datetime
 
-from lingua_franca import get_default_lang, set_default_lang
+from lingua_franca import get_default_lang, set_default_lang, load_language
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
@@ -24,6 +24,7 @@ from lingua_franca.lang.format_de import nice_response_de
 from lingua_franca.lang.format_de import pronounce_ordinal_de
 from lingua_franca.format import join_list
 
+load_language('de')
 
 # fractions are not capitalized for now
 NUMBERS_FIXTURE_DE = {

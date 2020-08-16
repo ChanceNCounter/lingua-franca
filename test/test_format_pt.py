@@ -17,8 +17,11 @@
 import unittest
 import datetime
 
+from lingua_franca import load_language
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
+
+load_language('pt')
 
 NUMBERS_FIXTURE_PT = {
     1.435634: '1,436',

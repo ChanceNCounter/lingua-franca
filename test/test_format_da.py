@@ -16,11 +16,14 @@
 import unittest
 import datetime
 
+from lingua_franca import load_language
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
 # from mycroft_parsers.lang.format_da import nice_response_da
 from lingua_franca.lang.format_da import pronounce_ordinal_da
+
+load_language('da')
 
 # fractions are not capitalized for now
 NUMBERS_FIXTURE_da = {

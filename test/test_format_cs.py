@@ -20,7 +20,7 @@ import ast
 import sys
 from pathlib import Path
 
-from lingua_franca import get_default_lang, set_default_lang
+from lingua_franca import get_default_lang, set_default_lang, load_language
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import nice_date
@@ -30,6 +30,9 @@ from lingua_franca.format import nice_duration
 from lingua_franca.format import pronounce_number
 from lingua_franca.format import date_time_format
 from lingua_franca.format import join_list
+
+
+load_language("cs-cz")
 
 
 NUMBERS_FIXTURE_CS = {
