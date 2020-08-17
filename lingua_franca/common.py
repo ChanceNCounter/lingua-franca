@@ -227,6 +227,46 @@ def raise_unsupported_language(language):
                                    .format(language=language, supported=supported))
 
 
+def localized_function(func):
+    def call_localized_function(*args, **kwargs):
+        lang_code = kwargs['lang'] if 'lang' in kwargs.keys() \
+                                   else get_default_lang()
+        if not lang_code:
+            raise ModuleNotFoundError("No language module loaded.")
+        if lang_code not in _SUPPORTED_LANGUAGES:
+            raise_unsupported_language(lang_code)
+
+        _module_name = func.__module__.split('.')[-1]
+        _module = import_module(".lang." + _module_name + \
+                                "_" + lang_code, "lingua_franca")
+        if _module_name not in _localized_functions.keys():
+            raise ModuleNotFoundError("Module lingua_franca." + \
+                                      _module_name + " not recognized")
+        if lang_code not in _localized_functions[_module_name].keys() \
+            and lang_code in _SUPPORTED_LANGUAGES:
+            raise ModuleNotFoundError(_module_name + " module of language '" +
+                                      lang_code + "' is not currently loaded.")
+        func_name = func.__name__.split('.')[-1]
+        try:
+            localized_func = getattr(_module, func_name + "_" + lang_code)
+        except AttributeError:
+            raise FunctionNotLocalizedError
+        loc_signature = _localized_functions[_module_name][lang_code][func_name]
+        if isinstance(loc_signature, type(NotImplementedError())):
+            raise loc_signature
+
+        r_val = localized_func(*args, **{arg: val for arg, val \
+                    in kwargs.items() \
+                    if arg in loc_signature.parameters})
+        del localized_func
+        del _module
+        return r_val
+    try:
+        return call_localized_function
+    except NotImplementedError as e:
+        warn(str(e))
+        return None
+
 def localized_function_caller(mod, func_name, lang, args):
     """Calls a localized function from a dictionary populated by
         `populate_localized_function_dict()`

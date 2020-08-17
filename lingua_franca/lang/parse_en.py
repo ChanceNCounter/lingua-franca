@@ -1455,6 +1455,6 @@ class EnglishNormalizer(Normalizer):
         _default_config = json.load(f)
 
 
-def normalize_en(text, remove_articles):
+def normalize_en(text, remove_articles=True):
     """ English string normalization """
     return EnglishNormalizer().normalize(text, remove_articles)
