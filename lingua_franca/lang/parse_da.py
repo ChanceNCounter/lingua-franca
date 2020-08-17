@@ -845,7 +845,7 @@ def is_ordinal_da(input_str):
     return False
 
 
-def normalize_da(text, remove_articles):
+def normalize_da(text, remove_articles=True):
     """ German string normalization """
 
     words = text.split()  # this also removed extra spaces

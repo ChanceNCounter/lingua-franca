@@ -758,7 +758,7 @@ def is_fractional_sv(input_str, short_scale=True):
     return False
 
 
-def normalize_sv(text, remove_articles):
+def normalize_sv(text, remove_articles=True):
     """ English string normalization """
 
     words = text.split()  # this also removed extra spaces

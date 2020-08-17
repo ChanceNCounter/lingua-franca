@@ -81,6 +81,12 @@ def get_active_langs():
 
 
 def load_language(lang):
+    if lang not in _SUPPORTED_LANGUAGES:
+        try:
+            _tmp = get_primary_lang_code(lang)
+        except KeyError:
+            raise_unsupported_language(lang)
+        lang = _tmp
     if lang not in __loaded_langs:
         __loaded_langs.append(lang)
     if not __default_lang:
@@ -234,7 +240,10 @@ def localized_function(func):
         if not lang_code:
             raise ModuleNotFoundError("No language module loaded.")
         if lang_code not in _SUPPORTED_LANGUAGES:
-            raise_unsupported_language(lang_code)
+            try:
+                lang_code = get_primary_lang_code(lang_code)
+            except KeyError:
+                raise_unsupported_language(lang_code)
 
         _module_name = func.__module__.split('.')[-1]
         _module = import_module(".lang." + _module_name + \

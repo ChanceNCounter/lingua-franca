@@ -16,11 +16,13 @@
 import unittest
 from datetime import datetime, time
 
+from lingua_franca import load_language
 from lingua_franca.parse import get_gender
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_number
 from lingua_franca.parse import normalize
 
+load_language('fr-fr')
 
 class TestNormalize_fr(unittest.TestCase):
     def test_articles_fr(self):

@@ -851,7 +851,7 @@ def is_ordinal_de(input_str):
     return False
 
 
-def normalize_de(text, remove_articles):
+def normalize_de(text, remove_articles=True):
     """ German string normalization """
     # TODO return GermanNormalizer().normalize(text, remove_articles)
     words = text.split()  # this also removed extra spaces

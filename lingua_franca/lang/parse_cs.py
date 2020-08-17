@@ -661,7 +661,7 @@ def extract_duration_cs(text):
     return (duration, text)
 
 
-def extract_datetime_cs(text, anchorDate, default_time):
+def extract_datetime_cs(text, anchorDate=None, default_time=None):
     """ Convert a human date reference into an exact datetime
 
     Convert things like
@@ -1586,7 +1586,7 @@ class CzechNormalizer(Normalizer):
         _default_config = json.load(f)
 
 
-def normalize_cs(text, remove_articles):
+def normalize_cs(text, remove_articles=True):
     """ Czech string normalization """
     return CzechNormalizer().normalize(text, remove_articles)
 

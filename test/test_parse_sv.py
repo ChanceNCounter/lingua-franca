@@ -21,7 +21,7 @@ from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_number
 from lingua_franca.parse import normalize
 
-load_language('sv')
+load_language('sv-se')
 
 class TestNormalize(unittest.TestCase):
     def test_extractnumber_sv(self):

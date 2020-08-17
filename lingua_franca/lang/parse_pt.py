@@ -217,7 +217,7 @@ class PortugueseNormalizer(Normalizer):
         return tokens
 
 
-def normalize_pt(text, remove_articles):
+def normalize_pt(text, remove_articles=True):
     """ PT string normalization """
     return PortugueseNormalizer().normalize(text, remove_articles)
 

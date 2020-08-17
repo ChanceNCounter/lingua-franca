@@ -16,7 +16,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from lingua_franca import get_default_lang, set_default_lang
+from lingua_franca import get_default_lang, set_default_lang, load_language
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_duration
 from lingua_franca.parse import extract_number, extract_numbers
@@ -25,6 +25,7 @@ from lingua_franca.parse import get_gender
 from lingua_franca.parse import match_one
 from lingua_franca.parse import normalize
 
+load_language('cs-cz')
 
 class TestFuzzyMatch(unittest.TestCase):
     def test_matches(self):

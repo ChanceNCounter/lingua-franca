@@ -286,7 +286,7 @@ def extract_numbers_es(text, short_scale=True, ordinals=False):
                                    ordinals=ordinals)
 
 
-def normalize_es(text, remove_articles):
+def normalize_es(text, remove_articles=True):
     """ Spanish string normalization """
     # TODO return SpanishNormalizer().normalize(text, remove_articles)
     words = text.split()  # this also removed extra spaces

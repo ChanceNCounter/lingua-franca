@@ -404,7 +404,7 @@ def extract_number_it(text, short_scale=False, ordinals=False):
     return val
 
 
-def normalize_it(text, remove_articles):
+def normalize_it(text, remove_articles=True):
     """ IT string normalization """
     # replace ambiguous words
     text = text.replace('un paio', 'due')

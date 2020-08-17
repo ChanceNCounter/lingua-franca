@@ -972,7 +972,7 @@ def is_fractional_fr(input_str, short_scale=True):
 
     return False
 
-def normalize_fr(text, remove_articles):
+def normalize_fr(text, remove_articles=True):
     """ French string normalization """
     text = text.lower()
     words = text.split()  # this also removed extra spaces
