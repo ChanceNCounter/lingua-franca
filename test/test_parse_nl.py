@@ -17,12 +17,16 @@
 import unittest
 from datetime import datetime, time
 
-from lingua_franca import load_language, set_default_lang
+from lingua_franca import load_language, set_default_lang, unload_language
 from lingua_franca.parse import extract_datetime, extract_number, normalize
 
+
 LANG = "nl-nl"
-load_language('nl-nl')
-set_default_lang('nl-nl')
+def setUpModule():
+    load_language('nl-nl')
+    set_default_lang('nl-nl')
+def tearDownModule():
+    unload_language('nl')
 
 class TestParsing(unittest.TestCase):
     def test_articles(self):

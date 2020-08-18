@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from lingua_franca.common import raise_unsupported_language
+
 from difflib import SequenceMatcher
 from warnings import warn
+from lingua_franca.common import raise_unsupported_language
 from lingua_franca.time import now_local
 from lingua_franca.common import localized_function_caller, \
     populate_localized_function_dict, get_active_langs, \
