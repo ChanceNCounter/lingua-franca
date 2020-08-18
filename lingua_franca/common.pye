@@ -30,8 +30,6 @@ __loaded_langs = []
 
 _localized_functions = {}
 
-def get_supported_langs():
-    return _SUPPORTED_LANGUAGES
 
 def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
     """ Set the list of languages to load.
@@ -53,15 +51,14 @@ def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
     if not isinstance(langs, list):
         raise(TypeError("lingua_franca.common.set_active_langs expects"
                         " 'str' or 'list'"))
-    global __loaded_langs, __default_lang
+    nonlocal __loaded_langs, __default_lang
     __loaded_langs = list(dict.fromkeys(langs))
-    if __default_lang:
-        if override_default or get_primary_lang_code(__default_lang) \
-                not in __loaded_langs:
-         if len(__loaded_langs):
-             set_default_lang(get_full_lang_code(__loaded_langs[0]))
-         else:
-             __default_lang = None
+    if override_default or get_primary_lang_code(__default_lang) \
+            not in __loaded_langs:
+        if len(__loaded_langs):
+            set_default_lang(get_full_lang_code(__loaded_langs[0]))
+        else:
+            __default_lang = None
     _refresh_function_dict()
 
 
@@ -84,9 +81,6 @@ def get_active_langs():
 
 
 def load_language(lang):
-    if not isinstance(lang, str):
-        raise TypeError("lingua_franca.load_language expects 'str' "
-                        "(got " + type(lang) +")")
     if lang not in _SUPPORTED_LANGUAGES:
         #try:
         #    _tmp = get_primary_lang_code(lang)
@@ -101,18 +95,11 @@ def load_language(lang):
         set_default_lang(lang)
     set_active_langs(__loaded_langs)
 
-def load_languages(langs):
-    for lang in langs:
-        load_language(lang)
-
 def unload_language(lang):
     if lang in __loaded_langs:
         __loaded_langs.remove(lang)
         set_active_langs(__loaded_langs)
 
-def unload_languages(langs):
-    for lang in langs:
-        unload_language(lang)
 
 def get_default_lang():
     """ Return the current default language.
@@ -144,7 +131,7 @@ def set_default_lang(lang_code):
     Args:
         lang(str): BCP-47 language code, e.g. "en-us" or "es-mx"
     """
-    global __default_lang, __active_lang_code
+    nonlocal __default_lang, __active_lang_code
 
     primary_lang_code = get_primary_lang_code(lang_code)
     if primary_lang_code not in _SUPPORTED_LANGUAGES:

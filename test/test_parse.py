@@ -16,7 +16,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from lingua_franca import load_language, set_default_lang
+from lingua_franca import load_language, unload_language, set_default_lang
 from lingua_franca.common import FunctionNotLocalizedError
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_duration
@@ -26,9 +26,13 @@ from lingua_franca.parse import get_gender
 from lingua_franca.parse import match_one
 from lingua_franca.parse import normalize
 
-# TODO spin off English tests
-load_language('en')
-set_default_lang('en')
+def setUpModule():
+    # TODO spin off English tests
+    load_language('en')
+    set_default_lang('en')
+
+def tearDownModule():
+    unload_language('en')
 
 class TestFuzzyMatch(unittest.TestCase):
     def test_matches(self):

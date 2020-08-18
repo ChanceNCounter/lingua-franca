@@ -18,13 +18,16 @@ import unittest
 import datetime
 import sys
 
-from lingua_franca import load_language
+from lingua_franca import load_language, unload_language, set_default_lang
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
 
-load_language('it')
-
+def setUpModule():
+    load_language('it-it')
+    set_default_lang('it')
+def tearDownModule():
+    unload_language('it')
 NUMBERS_FIXTURE_IT = {
     1.435634: '1.436',
     2: '2',

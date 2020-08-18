@@ -16,12 +16,15 @@
 import unittest
 import datetime
 
-from lingua_franca import load_language
+from lingua_franca import load_language, unload_language, set_default_lang
 from lingua_franca.format import nice_number, nice_time, pronounce_number
 from lingua_franca.lang.format_sv import pronounce_ordinal_sv
 
-load_language('sv')
-
+def setUpModule():
+    load_language('sv')
+    set_default_lang('sv')
+def TearDownModule():
+    unload_language('sv')
 # fractions are not capitalized for now
 NUMBERS_FIXTURE_sv = {
     1.435634: '1.436',

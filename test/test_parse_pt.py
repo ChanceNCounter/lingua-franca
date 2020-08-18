@@ -16,14 +16,17 @@
 import unittest
 from datetime import datetime, time
 
-from lingua_franca import load_language
+from lingua_franca import load_language, unload_language, set_default_lang
 from lingua_franca.parse import get_gender
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_number
 from lingua_franca.parse import normalize
 
-load_language('pt-pt')
-
+def setUpModule():
+    load_language('pt-pt')
+    set_default_lang('pt')
+def tearDownModule():
+    unload_language('pt')
 class TestNormalize(unittest.TestCase):
     """
         Test cases for Portuguese parsing

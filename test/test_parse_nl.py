@@ -17,10 +17,12 @@
 import unittest
 from datetime import datetime, time
 
+from lingua_franca import load_language, set_default_lang
 from lingua_franca.parse import extract_datetime, extract_number, normalize
 
 LANG = "nl-nl"
-
+load_language('nl-nl')
+set_default_lang('nl-nl')
 
 class TestParsing(unittest.TestCase):
     def test_articles(self):
@@ -71,8 +73,8 @@ class TestParsing(unittest.TestCase):
     def test_extractdatetime_nl(self):
         def extractWithFormat(text):
             date = datetime(2017, 6, 27, 0, 0)
-            [extractedDate, leftover] = extract_datetime(text, date,
-                                                         LANG, )
+            [extractedDate, leftover] = extract_datetime(text, anchorDate=date,
+                                                         lang=LANG)
             extractedDate = extractedDate.strftime("%Y-%m-%d %H:%M:%S")
             return [extractedDate, leftover]
 

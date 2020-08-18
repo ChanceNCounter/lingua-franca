@@ -16,13 +16,16 @@
 from datetime import datetime
 import unittest
 
-from lingua_franca import load_language
+from lingua_franca import load_language, unload_language, set_default_lang
 from lingua_franca.parse import (normalize, extract_numbers, extract_number,
                                  extract_datetime)
 from lingua_franca.lang.parse_es import extract_datetime_es, is_fractional_es
 
-load_language('es-es')
-
+def setUpModule():
+    load_language('es-es')
+    set_default_lang('es')
+def tearDownModule():
+    unload_language('es')
 class TestNormalize(unittest.TestCase):
     """
         Test cases for Spanish parsing

@@ -1299,7 +1299,7 @@ def extract_numbers_nl(text, short_scale=True, ordinals=False):
     return [float(result.value) for result in results]
 
 
-def normalize_nl(text, remove_articles):
+def normalize_nl(text, remove_articles=True):
     """Dutch string normalization."""
 
     words = text.split()  # this also removed extra spaces
