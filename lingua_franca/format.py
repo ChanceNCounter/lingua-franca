@@ -236,7 +236,7 @@ class DateTimeFormat:
 date_time_format = DateTimeFormat(os.path.join(os.path.dirname(__file__),
                                                'res/text'))
 
-@localized_function(return_default_on_unsupported_language=True)
+@localized_function(run_own_code_on=[UnsupportedLanguageError])
 def nice_number(number, lang=None, speech=True, denominators=None):
     """Format a float to human readable functions
 
@@ -250,19 +250,6 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     Returns:
         (str): The formatted string.
     """
-    # Default to the raw number for unsupported languages,
-    # hopefully the STT engine will pronounce understandably.
-    # TODO: nice_number_XX for other languages
-    # try:
-        # r_val = call_localized_function("nice_number", lang, locals().items())
-    # except NotImplementedError as e:
-        # warn(str(e))
-        # return str(number)
-    # return r_val
-    try:
-        raise_unsupported_language(lang)
-    except UnsupportedLanguageError as e:
-        warn(e)
     return str(number)
 
 @localized_function()
@@ -283,13 +270,6 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
     Returns:
         (str): The formatted time string
     """
-# 
-    # try:
-        # r_val = call_localized_function("nice_time", lang, locals().items())
-    # except NotImplementedError as e:
-        # warn(str(e))
-        # return str(dt)
-    # return r_val
 
 @localized_function()
 def pronounce_number(number, lang=None, places=2, short_scale=True,
@@ -308,13 +288,6 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     Returns:
         (str): The pronounced number
     """
-    # try:
-        # r_val = call_localized_function("pronounce_number", lang,
-                                        # locals().items())
-    # except NotImplementedError as e:
-        # warn(str(e))
-        # return str(number)
-    # return r_val
 
 def nice_date(dt, lang=None, now=None):
     """
@@ -552,5 +525,3 @@ def nice_response(text, lang=None):
         assertEqual(nice_response_de("10 ^ 2"),
                          "10 hoch 2")
     """
-    # return call_localized_function("nice_response", lang,
-                                   # locals().items()) or text
