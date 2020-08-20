@@ -319,65 +319,65 @@ def localized_function(return_default_on_unsupported_language=False):
         warn(str(e))
         return None
 
-def localized_function_caller(mod, func_name, lang, args):
-    """Calls a localized function from a dictionary populated by
-        `populate_localized_function_dict()`
-
-    Arguments:
-        mod(str): the module calling this function
-        func_name(str): the name of the function to find and call
-                (e.g. "pronounce_number")
-        lang(str): a language code
-        arguments(dict): the arguments to pass to the localized function
-
-    Returns:
-        Result of localized function
-
-    Note: Not intended for direct use. Called by top-level modules.
-
-    """
-    if not lang:
-        lang = get_default_lang()
-        if not lang:
-            raise ModuleNotFoundError("No language module loaded.")
-    lang_code = get_primary_lang_code(lang)
-    if lang_code not in _SUPPORTED_LANGUAGES:
-        raise_unsupported_language(lang_code)
-
-    elif mod not in _localized_functions.keys():
-        raise ModuleNotFoundError("Module lingua_franca." + mod +
-                                  " not recognized")
-
-    elif lang_code not in _localized_functions[mod].keys() and lang_code in \
-        _SUPPORTED_LANGUAGES:
-        raise ModuleNotFoundError(mod + " module of language '" +
-                                  lang_code + "' is not currently loaded.")
-
-    # _localized_functions is a dict of dicts:
-    #   functions, by module and then by language code
-    #   _localized_functions{[module]: {[language]: [functions]}}
-    func_signature = _localized_functions[mod][lang_code][func_name]
-    if not func_signature:
-        raise KeyError("Something is very wrong with Lingua Franca."
-                       " Have you altered the library? If not, please"
-                       " contact the developers through GitHub.")
-    elif isinstance(func_signature, type(NotImplementedError())):
-        raise func_signature
-    else:
-        _module = import_module(".lang." + mod + "_" + lang_code,
-                                "lingua_franca")
-        func = getattr(_module, func_name + "_" + lang_code)
-        r_val = func(**{arg: val for arg, val in args if arg in
-                        func_signature.parameters})
-        del func
-        del _module
-        return r_val
+# def localized_function_caller(mod, func_name, lang, args):
+    # """Calls a localized function from a dictionary populated by
+        # `populate_localized_function_dict()`
+# 
+    # Arguments:
+        # mod(str): the module calling this function
+        # func_name(str): the name of the function to find and call
+                # (e.g. "pronounce_number")
+        # lang(str): a language code
+        # arguments(dict): the arguments to pass to the localized function
+# 
+    # Returns:
+        # Result of localized function
+# 
+    # Note: Not intended for direct use. Called by top-level modules.
+# 
+    # """
+    # if not lang:
+        # lang = get_default_lang()
+        # if not lang:
+            # raise ModuleNotFoundError("No language module loaded.")
+    # lang_code = get_primary_lang_code(lang)
+    # if lang_code not in _SUPPORTED_LANGUAGES:
+        # raise_unsupported_language(lang_code)
+# 
+    # elif mod not in _localized_functions.keys():
+        # raise ModuleNotFoundError("Module lingua_franca." + mod +
+                                  # " not recognized")
+# 
+    # elif lang_code not in _localized_functions[mod].keys() and lang_code in \
+        # _SUPPORTED_LANGUAGES:
+        # raise ModuleNotFoundError(mod + " module of language '" +
+                                  # lang_code + "' is not currently loaded.")
+# 
+##    _localized_functions is a dict of dicts:
+##      functions, by module and then by language code
+##      _localized_functions{[module]: {[language]: [functions]}}
+    # func_signature = _localized_functions[mod][lang_code][func_name]
+    # if not func_signature:
+        # raise KeyError("Something is very wrong with Lingua Franca."
+                       # " Have you altered the library? If not, please"
+                       # " contact the developers through GitHub.")
+    # elif isinstance(func_signature, type(NotImplementedError())):
+        # raise func_signature
+    # else:
+        # _module = import_module(".lang." + mod + "_" + lang_code,
+                                # "lingua_franca")
+        # func = getattr(_module, func_name + "_" + lang_code)
+        # r_val = func(**{arg: val for arg, val in args if arg in
+                        # func_signature.parameters})
+        # del func
+        # del _module
+        # return r_val
 
 
 def populate_localized_function_dict(lf_module, langs=get_active_langs()):
     """Returns a dictionary of dictionaries, containing localized functions.
 
-    Used by the top-level modules to locate, cache, and call localized functions.
+    Used by the top-level modules to locate, cache, and call localized funcs.
 
     Arguments:
         lf_module(str) - - the name of the top-level module
@@ -390,7 +390,7 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
         but it's normally discarded. Rather, this function will create
         the dictionary as a member of
         `lingua_franca.common._localized_functions`,
-        and its members are invoked via `call_localized_function()`.
+        and its members are invoked via the `@localized_function` decorator.
 
         The dictionary is returned for 
 
