@@ -24,10 +24,11 @@ from os.path import join
 
 
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca.common import localized_function_caller, localized_function, \
+from lingua_franca.common import localized_function, \
     populate_localized_function_dict, get_active_langs, \
-    get_full_lang_code, get_primary_lang_code, get_default_lang, \
-    get_default_loc, is_supported_full_lang
+    get_full_lang_code, get_default_lang, get_default_loc, \
+    is_supported_full_lang, raise_unsupported_language, \
+    UnsupportedLanguageError
 
 
 _REGISTERED_FUNCTIONS = ("nice_number",
@@ -36,12 +37,6 @@ _REGISTERED_FUNCTIONS = ("nice_number",
                          "nice_response")
 
 populate_localized_function_dict("format", langs=get_active_langs())
-
-
-def call_localized_function(func_name, lang=get_default_lang(), arguments={}):
-    return localized_function_caller("format",
-                                     func_name, lang, arguments)
-
 
 def _translate_word(name, lang=None):
     """ Helper to get word translations
@@ -264,6 +259,10 @@ def nice_number(number, lang=None, speech=True, denominators=None):
         # warn(str(e))
         # return str(number)
     # return r_val
+    try:
+        raise_unsupported_language(lang)
+    except UnsupportedLanguageError as e:
+        warn(e)
     return str(number)
 
 @localized_function()
