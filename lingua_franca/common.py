@@ -250,26 +250,70 @@ def raise_unsupported_language(language):
                                    .format(language=language, supported=supported))
 
 
-def localized_function(return_default_on_unsupported_language=False):
+def localized_function(run_own_code_on=[type(None)]):
+    """
+    Decorator which finds localized functions, and calls them, from signatures
+    defined in the top-level modules. See lingua_franca.format or .parse for
+    examples of the decorator in action.
+
+    Note that, by default, wrapped functions will never actually be executed.
+    Rather, when they're called, their arguments will be passed directly to
+    their localized equivalent, specified by the 'lang' parameter.
+
+    For instance, this decorator wraps parse.extract_number(), which has no
+    logic of its own. A call to
+
+        extract_number('uno', lang='es')
+
+    will locate and call
+
+        lingua_franca.lang.parse_es.extract_number_es('uno')
+
+    Arguments:
+        run_own_code_on(list(type), optional)
+            A list of Error types (ValueError, NotImplementedError, etc)
+            which, if they are raised, will trigger the wrapped function's
+            own code.
+
+            If this argument is omitted, the function itself will never
+            be run. Calls to the wrapped function will be passed to the
+            appropriate, localized function.
+
+
+    """
+    # Make sure everything in run_own_code_on is an Error or None
+    def is_error_type(_type):
+        _instance = _type()
+        rval = isinstance(_instance, BaseException) if _instance else True
+        del _instance
+        return rval
+    if not isinstance(run_own_code_on, list):
+        run_own_code_on = list(run_own_code_on)
+    if not all((is_error_type(e) for e in run_own_code_on)):
+        raise ValueError("@localized_function(run_own_code_on=<>) expected an "
+                         "Error type, or a list of Error types. Instead, it "
+                         "received this value:\n" + str(run_own_code_on))
+    # Begin wrapper
     def localized_function_decorator(func):
         @wraps(func)
         def call_localized_function(*args, **kwargs):
-            func_signature = signature(func)
-            func_params = list(func_signature.parameters)
-            lang_param_index = func_params.index('lang')
+            try:
+                func_signature = signature(func)
+                func_params = list(func_signature.parameters)
+                lang_param_index = func_params.index('lang')
 
-            lang_code = get_default_lang()
-            full_lang_code = __active_lang_code
-            if 'lang' in kwargs.keys():
-                lang_code = kwargs['lang']
-            elif lang_param_index < len(args):
-                if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
-                                              _SUPPORTED_FULL_LOCALIZATIONS):
-                    lang_code = args[lang_param_index]
-            if not lang_code:
-                raise ModuleNotFoundError("No language module loaded.")
-            if lang_code not in _SUPPORTED_LANGUAGES:
-                try:
+                lang_code = get_default_lang()
+                full_lang_code = __active_lang_code
+                if 'lang' in kwargs.keys():
+                    lang_code = kwargs['lang']
+                elif lang_param_index < len(args):
+                    if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
+                                                  _SUPPORTED_FULL_LOCALIZATIONS):
+                        lang_code = args[lang_param_index]
+                if not lang_code:
+                    raise ModuleNotFoundError("No language module loaded.")
+                if lang_code not in _SUPPORTED_LANGUAGES:
+                    # try:
                     try:
                         lang_code = get_primary_lang_code(lang_code)
                     except ValueError:
@@ -277,101 +321,47 @@ def localized_function(return_default_on_unsupported_language=False):
                     if lang_code not in _SUPPORTED_LANGUAGES:
                         raise_unsupported_language(lang_code)
                     full_lang_code = lang_code
-                except UnsupportedLanguageError as e:
-                    if return_default_on_unsupported_language:
-                        return func(*args, **kwargs)
-                    else:
-                        raise e 
 
-            _module_name = func.__module__.split('.')[-1]
-            _module = import_module(".lang." + _module_name + \
-                                    "_" + lang_code, "lingua_franca")
-            if _module_name not in _localized_functions.keys():
-                raise ModuleNotFoundError("Module lingua_franca." + \
-                                          _module_name + " not recognized")
-            if lang_code not in _localized_functions[_module_name].keys() \
-                and lang_code in _SUPPORTED_LANGUAGES:
-                raise ModuleNotFoundError(_module_name + " module of language '" +
-                                          lang_code + "' is not currently loaded.")
-            func_name = func.__name__.split('.')[-1]
-            try:
-                localized_func = getattr(_module, func_name + "_" + lang_code)
-            except AttributeError:
-                raise FunctionNotLocalizedError
-            loc_signature = _localized_functions[_module_name][lang_code][func_name]
-            if isinstance(loc_signature, type(NotImplementedError())):
-                raise loc_signature
+                _module_name = func.__module__.split('.')[-1]
+                _module = import_module(".lang." + _module_name + \
+                                        "_" + lang_code, "lingua_franca")
+                if _module_name not in _localized_functions.keys():
+                    raise ModuleNotFoundError("Module lingua_franca." + \
+                                              _module_name + " not recognized")
+                if lang_code not in _localized_functions[_module_name].keys() \
+                    and lang_code in _SUPPORTED_LANGUAGES:
+                    raise ModuleNotFoundError(_module_name + " module of language '" +
+                                              lang_code + "' is not currently loaded.")
+                func_name = func.__name__.split('.')[-1]
+                try:
+                    localized_func = getattr(_module, func_name + "_" + lang_code)
+                except AttributeError:
+                    raise FunctionNotLocalizedError
+                loc_signature = _localized_functions[_module_name][lang_code][func_name]
+                if isinstance(loc_signature, type(NotImplementedError())):
+                    raise loc_signature
 
-            if 'lang' in kwargs:
-                del kwargs['lang']
-            elif lang_code in args or full_lang_code in args:
-                args = (arg for arg in args if arg not in (lang_code, full_lang_code))
-            r_val = localized_func(*args, **{arg: val for arg, val \
-                        in kwargs.items() \
-                        if arg in loc_signature.parameters})
-            del localized_func
-            del _module
-            return r_val
+                if 'lang' in kwargs:
+                    del kwargs['lang']
+                elif lang_code in args or full_lang_code in args:
+                    args = (arg for arg in args if arg not in (lang_code, full_lang_code))
+                r_val = localized_func(*args, **{arg: val for arg, val \
+                            in kwargs.items() \
+                            if arg in loc_signature.parameters})
+                del localized_func
+                del _module
+                return r_val
+            except Exception as e:
+                if any((isinstance(e, error) for error in run_own_code_on)):
+                    return func(*args, **kwargs)
+                else:
+                    raise e
         return call_localized_function
     try:
         return localized_function_decorator
     except NotImplementedError as e:
         warn(str(e))
         return None
-
-# def localized_function_caller(mod, func_name, lang, args):
-    # """Calls a localized function from a dictionary populated by
-        # `populate_localized_function_dict()`
-# 
-    # Arguments:
-        # mod(str): the module calling this function
-        # func_name(str): the name of the function to find and call
-                # (e.g. "pronounce_number")
-        # lang(str): a language code
-        # arguments(dict): the arguments to pass to the localized function
-# 
-    # Returns:
-        # Result of localized function
-# 
-    # Note: Not intended for direct use. Called by top-level modules.
-# 
-    # """
-    # if not lang:
-        # lang = get_default_lang()
-        # if not lang:
-            # raise ModuleNotFoundError("No language module loaded.")
-    # lang_code = get_primary_lang_code(lang)
-    # if lang_code not in _SUPPORTED_LANGUAGES:
-        # raise_unsupported_language(lang_code)
-# 
-    # elif mod not in _localized_functions.keys():
-        # raise ModuleNotFoundError("Module lingua_franca." + mod +
-                                  # " not recognized")
-# 
-    # elif lang_code not in _localized_functions[mod].keys() and lang_code in \
-        # _SUPPORTED_LANGUAGES:
-        # raise ModuleNotFoundError(mod + " module of language '" +
-                                  # lang_code + "' is not currently loaded.")
-# 
-##    _localized_functions is a dict of dicts:
-##      functions, by module and then by language code
-##      _localized_functions{[module]: {[language]: [functions]}}
-    # func_signature = _localized_functions[mod][lang_code][func_name]
-    # if not func_signature:
-        # raise KeyError("Something is very wrong with Lingua Franca."
-                       # " Have you altered the library? If not, please"
-                       # " contact the developers through GitHub.")
-    # elif isinstance(func_signature, type(NotImplementedError())):
-        # raise func_signature
-    # else:
-        # _module = import_module(".lang." + mod + "_" + lang_code,
-                                # "lingua_franca")
-        # func = getattr(_module, func_name + "_" + lang_code)
-        # r_val = func(**{arg: val for arg, val in args if arg in
-                        # func_signature.parameters})
-        # del func
-        # del _module
-        # return r_val
 
 
 def populate_localized_function_dict(lf_module, langs=get_active_langs()):
