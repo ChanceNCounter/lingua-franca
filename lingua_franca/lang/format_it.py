@@ -19,7 +19,7 @@ from lingua_franca.lang.common_data_it import _NUM_STRING_IT, \
     _FRACTION_STRING_IT, _LONG_SCALE_IT, _SHORT_SCALE_IT
 
 
-def nice_number_it(number, speech, denominators=range(1, 21)):
+def nice_number_it(number, speech=True, denominators=range(1, 21)):
     """ Italian helper for nice_number
 
     This function formats a float to human understandable functions. Like

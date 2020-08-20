@@ -20,7 +20,7 @@ from lingua_franca.lang.common_data_sv import _EXTRA_SPACE_SV, \
 from math import floor
 
 
-def nice_number_sv(number, speech, denominators=range(1, 21)):
+def nice_number_sv(number, speech=True, denominators=range(1, 21)):
     """ Swedish helper for nice_number
 
     This function formats a float to human understandable functions. Like

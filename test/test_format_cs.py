@@ -364,9 +364,6 @@ class TestPronounceNumber(unittest.TestCase):
                                           short_scale=False), "osmnáct "
                                                               "triliontý")
 
-# def nice_time(dt, lang="en-us", speech=True, use_24hour=False,
-#              use_ampm=False):
-
 
 class TestNiceDateFormat(unittest.TestCase):
     @classmethod
@@ -394,7 +391,7 @@ class TestNiceDateFormat(unittest.TestCase):
 
         # Verify defaults haven't changed
         self.assertEqual(nice_time(dt),
-                         nice_time(dt, speech=True, use_24hour=False, use_ampm=False))
+                         nice_time(dt, speech=True, use_24hour=True, use_ampm=False))
 
         self.assertEqual(nice_time(dt, use_24hour=False),
                          "jedna dvacet dva")

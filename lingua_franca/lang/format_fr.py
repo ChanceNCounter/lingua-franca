@@ -18,7 +18,7 @@ from lingua_franca.lang.common_data_fr import _NUM_STRING_FR, \
     _FRACTION_STRING_FR
 
 
-def nice_number_fr(number, speech, denominators=range(1, 21)):
+def nice_number_fr(number, speech=True, denominators=range(1, 21)):
     """ French helper for nice_number
 
     This function formats a float to human understandable functions. Like

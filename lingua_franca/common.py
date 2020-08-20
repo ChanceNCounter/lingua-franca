@@ -1,4 +1,5 @@
 import os.path
+from functools import wraps
 from importlib import import_module
 from inspect import signature
 from warnings import warn
@@ -249,60 +250,71 @@ def raise_unsupported_language(language):
                                    .format(language=language, supported=supported))
 
 
-def localized_function(func):
-    def call_localized_function(*args, **kwargs):
-        func_signature = signature(func)
-        func_params = func_signature.parameters
-        lang_param_index = list(func_params).index('lang')
+def localized_function(return_default_on_unsupported_language=False):
+    def localized_function_decorator(func):
+        @wraps(func)
+        def call_localized_function(*args, **kwargs):
+            func_signature = signature(func)
+            func_params = list(func_signature.parameters)
+            lang_param_index = func_params.index('lang')
 
-        lang_code = get_default_lang()
-        full_lang_code = __active_lang_code
-        if lang_param_index < len(args):
-            if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
-                                          _SUPPORTED_FULL_LOCALIZATIONS):
-                lang_code = args[lang_param_index]
-        elif 'lang' in kwargs.keys():
-            lang_code = kwargs['lang']
-        if not lang_code:
-            raise ModuleNotFoundError("No language module loaded.")
-        if lang_code not in _SUPPORTED_LANGUAGES:
+            lang_code = get_default_lang()
+            full_lang_code = __active_lang_code
+            if 'lang' in kwargs.keys():
+                lang_code = kwargs['lang']
+            elif lang_param_index < len(args):
+                if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
+                                              _SUPPORTED_FULL_LOCALIZATIONS):
+                    lang_code = args[lang_param_index]
+            if not lang_code:
+                raise ModuleNotFoundError("No language module loaded.")
+            if lang_code not in _SUPPORTED_LANGUAGES:
+                try:
+                    try:
+                        lang_code = get_primary_lang_code(lang_code)
+                    except ValueError:
+                        raise_unsupported_language(lang_code)
+                    if lang_code not in _SUPPORTED_LANGUAGES:
+                        raise_unsupported_language(lang_code)
+                    full_lang_code = lang_code
+                except UnsupportedLanguageError as e:
+                    if return_default_on_unsupported_language:
+                        return func(*args, **kwargs)
+                    else:
+                        raise e 
+
+            _module_name = func.__module__.split('.')[-1]
+            _module = import_module(".lang." + _module_name + \
+                                    "_" + lang_code, "lingua_franca")
+            if _module_name not in _localized_functions.keys():
+                raise ModuleNotFoundError("Module lingua_franca." + \
+                                          _module_name + " not recognized")
+            if lang_code not in _localized_functions[_module_name].keys() \
+                and lang_code in _SUPPORTED_LANGUAGES:
+                raise ModuleNotFoundError(_module_name + " module of language '" +
+                                          lang_code + "' is not currently loaded.")
+            func_name = func.__name__.split('.')[-1]
             try:
-                full_lang_code = lang_code
-                lang_code = get_primary_lang_code(lang_code)
-            except KeyError:
-                raise_unsupported_language(lang_code)
+                localized_func = getattr(_module, func_name + "_" + lang_code)
+            except AttributeError:
+                raise FunctionNotLocalizedError
+            loc_signature = _localized_functions[_module_name][lang_code][func_name]
+            if isinstance(loc_signature, type(NotImplementedError())):
+                raise loc_signature
 
-        _module_name = func.__module__.split('.')[-1]
-        _module = import_module(".lang." + _module_name + \
-                                "_" + lang_code, "lingua_franca")
-        if _module_name not in _localized_functions.keys():
-            raise ModuleNotFoundError("Module lingua_franca." + \
-                                      _module_name + " not recognized")
-        if lang_code not in _localized_functions[_module_name].keys() \
-            and lang_code in _SUPPORTED_LANGUAGES:
-            raise ModuleNotFoundError(_module_name + " module of language '" +
-                                      lang_code + "' is not currently loaded.")
-        func_name = func.__name__.split('.')[-1]
-        try:
-            localized_func = getattr(_module, func_name + "_" + lang_code)
-        except AttributeError:
-            raise FunctionNotLocalizedError
-        loc_signature = _localized_functions[_module_name][lang_code][func_name]
-        if isinstance(loc_signature, type(NotImplementedError())):
-            raise loc_signature
-
-        if 'lang' in kwargs:
-            del kwargs['lang']
-        elif lang_code in args or full_lang_code in args:
-            args = (arg for arg in args if arg not in (lang_code, full_lang_code))
-        r_val = localized_func(*args, **{arg: val for arg, val \
-                    in kwargs.items() \
-                    if arg in loc_signature.parameters})
-        del localized_func
-        del _module
-        return r_val
-    try:
+            if 'lang' in kwargs:
+                del kwargs['lang']
+            elif lang_code in args or full_lang_code in args:
+                args = (arg for arg in args if arg not in (lang_code, full_lang_code))
+            r_val = localized_func(*args, **{arg: val for arg, val \
+                        in kwargs.items() \
+                        if arg in loc_signature.parameters})
+            del localized_func
+            del _module
+            return r_val
         return call_localized_function
+    try:
+        return localized_function_decorator
     except NotImplementedError as e:
         warn(str(e))
         return None

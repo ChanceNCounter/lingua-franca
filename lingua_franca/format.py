@@ -24,7 +24,7 @@ from os.path import join
 
 
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca.common import localized_function_caller, \
+from lingua_franca.common import localized_function_caller, localized_function, \
     populate_localized_function_dict, get_active_langs, \
     get_full_lang_code, get_primary_lang_code, get_default_lang, \
     get_default_loc, is_supported_full_lang
@@ -241,7 +241,7 @@ class DateTimeFormat:
 date_time_format = DateTimeFormat(os.path.join(os.path.dirname(__file__),
                                                'res/text'))
 
-
+@localized_function(return_default_on_unsupported_language=True)
 def nice_number(number, lang=None, speech=True, denominators=None):
     """Format a float to human readable functions
 
@@ -258,14 +258,15 @@ def nice_number(number, lang=None, speech=True, denominators=None):
     # Default to the raw number for unsupported languages,
     # hopefully the STT engine will pronounce understandably.
     # TODO: nice_number_XX for other languages
-    try:
-        r_val = call_localized_function("nice_number", lang, locals().items())
-    except NotImplementedError as e:
-        warn(str(e))
-        return str(number)
-    return r_val
+    # try:
+        # r_val = call_localized_function("nice_number", lang, locals().items())
+    # except NotImplementedError as e:
+        # warn(str(e))
+        # return str(number)
+    # return r_val
+    return str(number)
 
-
+@localized_function()
 def nice_time(dt, lang=None, speech=True, use_24hour=False,
               use_ampm=False):
     """
@@ -283,15 +284,15 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
     Returns:
         (str): The formatted time string
     """
+# 
+    # try:
+        # r_val = call_localized_function("nice_time", lang, locals().items())
+    # except NotImplementedError as e:
+        # warn(str(e))
+        # return str(dt)
+    # return r_val
 
-    try:
-        r_val = call_localized_function("nice_time", lang, locals().items())
-    except NotImplementedError as e:
-        warn(str(e))
-        return str(dt)
-    return r_val
-
-
+@localized_function()
 def pronounce_number(number, lang=None, places=2, short_scale=True,
                      scientific=False, ordinals=False):
     """
@@ -308,14 +309,13 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     Returns:
         (str): The pronounced number
     """
-    try:
-        r_val = call_localized_function("pronounce_number", lang,
-                                        locals().items())
-    except NotImplementedError as e:
-        warn(str(e))
-        return str(number)
-    return r_val
-
+    # try:
+        # r_val = call_localized_function("pronounce_number", lang,
+                                        # locals().items())
+    # except NotImplementedError as e:
+        # warn(str(e))
+        # return str(number)
+    # return r_val
 
 def nice_date(dt, lang=None, now=None):
     """
@@ -533,7 +533,7 @@ def expand_options(parentheses_line: str) -> list:
     options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
     return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
 
-
+@localized_function()
 def nice_response(text, lang=None):
     """
     In some languages, sanitizes certain numeric input for TTS
@@ -553,5 +553,5 @@ def nice_response(text, lang=None):
         assertEqual(nice_response_de("10 ^ 2"),
                          "10 hoch 2")
     """
-    return call_localized_function("nice_response", lang,
-                                   locals().items()) or text
+    # return call_localized_function("nice_response", lang,
+                                   # locals().items()) or text

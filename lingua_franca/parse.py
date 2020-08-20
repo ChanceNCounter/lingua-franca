@@ -34,12 +34,6 @@ _REGISTERED_FUNCTIONS = ("extract_numbers",
 
 populate_localized_function_dict("parse", langs=get_active_langs())
 
-
-def call_localized_function(func_name, lang, arguments):
-    return localized_function_caller("parse",
-                                     func_name, lang, arguments)
-
-
 def fuzzy_match(x, against):
     """Perform a 'fuzzy' comparison between two strings.
     Returns:
@@ -78,7 +72,7 @@ def match_one(query, choices):
         return best
 
 
-@localized_function
+@localized_function()
 def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
     """
         Takes in a string and extracts a list of numbers.
@@ -94,13 +88,8 @@ def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
     Returns:
         list: list of extracted numbers as floats, or empty list if none found
     """
-#    try:
-#        return call_localized_function("extract_numbers", lang, locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return []
 
-@localized_function
+@localized_function()
 def extract_number(text, short_scale=True, ordinals=False, lang=None):
     """Takes in a string and extracts a number.
 
@@ -116,13 +105,8 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
         (int, float or False): The number extracted or False if the input
                                text contains no numbers
     """
-#    try:
-#        return call_localized_function("extract_number", lang, locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return text
 
-@localized_function
+@localized_function()
 def extract_duration(text, lang=None):
     """ Convert an english phrase into a number of seconds
 
@@ -149,14 +133,8 @@ def extract_duration(text, lang=None):
                     be None if no duration is found. The text returned
                     will have whitespace stripped from the ends.
     """
-#    try:
-#        return call_localized_function("extract_duration", lang,
-#                                       locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return None
 
-@localized_function
+@localized_function()
 def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
     """
     Extracts date and time information from a sentence.  Parses many of the
@@ -209,14 +187,7 @@ def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
         None
     """
 
-#    try:
-#        return call_localized_function("extract_datetime", lang,
-#                                       locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return text
-
-@localized_function
+@localized_function()
 def normalize(text, lang=None, remove_articles=True):
     """Prepare a string for parsing
 
@@ -233,13 +204,7 @@ def normalize(text, lang=None, remove_articles=True):
         (str): The normalized string.
     """
 
-#    try:
-#        return call_localized_function("normalize", lang, locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return text
-
-@localized_function
+@localized_function()
 def get_gender(word, context="", lang=None):
     """ Guess the gender of a word
 
@@ -255,13 +220,8 @@ def get_gender(word, context="", lang=None):
         str: The code "m" (male), "f" (female) or "n" (neutral) for the gender,
              or None if unknown/or unused in the given language.
     """
-#    try:
-#        return call_localized_function("get_gender", lang, locals().items())
-#    except NotImplementedError as e:
-#        warn(str(e))
-#        return None
 
-@localized_function
+@localized_function()
 def is_fractional(input_str, short_scale=True, lang=None):
     """
     This function takes the given text and checks if it is a fraction.
@@ -274,9 +234,8 @@ def is_fractional(input_str, short_scale=True, lang=None):
         (bool) or (float): False if not a fraction, otherwise the fraction
 
     """
-#    return call_localized_function("is_fractional", lang, locals().items())
 
-@localized_function
+@localized_function()
 def is_ordinal(input_str, lang=None):
     """
     This function takes the given text and checks if it is an ordinal number.
@@ -288,4 +247,3 @@ def is_ordinal(input_str, lang=None):
         (bool) or (float): False if not an ordinal, otherwise the number
         corresponding to the ordinal
     """
-#    return call_localized_function("is_ordinal", lang, input_str)

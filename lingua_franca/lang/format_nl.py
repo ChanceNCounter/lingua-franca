@@ -20,7 +20,7 @@ from lingua_franca.lang.common_data_nl import _NUM_POWERS_OF_TEN, \
 from math import floor
 
 
-def nice_number_nl(number, speech, denominators=range(1, 21)):
+def nice_number_nl(number, speech=True, denominators=range(1, 21)):
     """ Dutch helper for nice_number
     This function formats a float to human understandable functions. Like
     4.5 becomes "4 einhalb" for speech and "4 1/2" for text

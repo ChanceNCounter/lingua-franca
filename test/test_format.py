@@ -546,7 +546,11 @@ class TestNiceDateFormat(unittest.TestCase):
                 self.assertTrue(len(nice_date(dt, lang=lang)) > 0)
 
     def test_nice_date_time(self):
+        # TODO: migrate these tests (in res files) to respect the new
+        # language loading features. Right now, some of them break if
+        # their languages are not default.
         for lang in self.test_config:
+            set_default_lang(lang)
             i = 1
             while (self.test_config[lang].get('test_nice_date_time') and
                    self.test_config[lang]['test_nice_date_time'].get(str(i))):
@@ -566,6 +570,7 @@ class TestNiceDateFormat(unittest.TestCase):
                         use_24hour=ast.literal_eval(p['use_24hour']),
                         use_ampm=ast.literal_eval(p['use_ampm'])))
                 i = i + 1
+        set_default_lang('en')
 
     def test_nice_year(self):
         for lang in self.test_config:
