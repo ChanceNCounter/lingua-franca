@@ -382,7 +382,7 @@ def localized_function(run_own_code_on=[type(None)]):
         return localized_function_decorator
     except NotImplementedError as e:
         warn(str(e))
-        return None
+        return
 
 
 def populate_localized_function_dict(lf_module, langs=get_active_langs()):
