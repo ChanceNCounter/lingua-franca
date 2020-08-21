@@ -21,11 +21,11 @@ import warnings
 import sys
 from pathlib import Path
 
-# TODO either write a getter for lingua_franca.common._SUPPORTED_LANGUAGES,
+# TODO either write a getter for lingua_franca.internal._SUPPORTED_LANGUAGES,
 # or make it public somehow
 from lingua_franca import load_languages, unload_languages, set_default_lang, \
     get_primary_lang_code, get_active_langs, get_supported_langs
-from lingua_franca.common import UnsupportedLanguageError
+from lingua_franca.internal import UnsupportedLanguageError
 from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import nice_date

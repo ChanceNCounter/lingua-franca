@@ -17,7 +17,7 @@ import unittest
 from datetime import datetime, time
 
 from lingua_franca import load_language, unload_language, set_default_lang
-from lingua_franca.common import FunctionNotLocalizedError
+from lingua_franca.internal import FunctionNotLocalizedError
 from lingua_franca.parse import get_gender
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_number

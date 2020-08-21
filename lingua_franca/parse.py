@@ -16,11 +16,10 @@
 
 from difflib import SequenceMatcher
 from warnings import warn
-from lingua_franca.common import raise_unsupported_language
 from lingua_franca.time import now_local
-from lingua_franca.common import populate_localized_function_dict, \
+from lingua_franca.internal import populate_localized_function_dict, \
     get_active_langs, get_full_lang_code, get_primary_lang_code, \
-    get_default_lang, localized_function
+    get_default_lang, localized_function, raise_unsupported_language
 
 _REGISTERED_FUNCTIONS = ("extract_numbers",
                          "extract_number",
@@ -32,6 +31,7 @@ _REGISTERED_FUNCTIONS = ("extract_numbers",
                          "is_ordinal")
 
 populate_localized_function_dict("parse", langs=get_active_langs())
+
 
 def fuzzy_match(x, against):
     """Perform a 'fuzzy' comparison between two strings.
@@ -88,6 +88,7 @@ def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
         list: list of extracted numbers as floats, or empty list if none found
     """
 
+
 @localized_function()
 def extract_number(text, short_scale=True, ordinals=False, lang=None):
     """Takes in a string and extracts a number.
@@ -104,6 +105,7 @@ def extract_number(text, short_scale=True, ordinals=False, lang=None):
         (int, float or False): The number extracted or False if the input
                                text contains no numbers
     """
+
 
 @localized_function()
 def extract_duration(text, lang=None):
@@ -132,6 +134,7 @@ def extract_duration(text, lang=None):
                     be None if no duration is found. The text returned
                     will have whitespace stripped from the ends.
     """
+
 
 @localized_function()
 def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
@@ -186,6 +189,7 @@ def extract_datetime(text, anchorDate=None, lang=None, default_time=None):
         None
     """
 
+
 @localized_function()
 def normalize(text, lang=None, remove_articles=True):
     """Prepare a string for parsing
@@ -202,6 +206,7 @@ def normalize(text, lang=None, remove_articles=True):
     Returns:
         (str): The normalized string.
     """
+
 
 @localized_function()
 def get_gender(word, context="", lang=None):
@@ -220,6 +225,7 @@ def get_gender(word, context="", lang=None):
              or None if unknown/or unused in the given language.
     """
 
+
 @localized_function()
 def is_fractional(input_str, short_scale=True, lang=None):
     """
@@ -233,6 +239,7 @@ def is_fractional(input_str, short_scale=True, lang=None):
         (bool) or (float): False if not a fraction, otherwise the fraction
 
     """
+
 
 @localized_function()
 def is_ordinal(input_str, lang=None):

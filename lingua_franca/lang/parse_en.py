@@ -28,7 +28,7 @@ from lingua_franca.lang.common_data_en import _ARTICLES_EN, _NUM_STRING_EN, \
 
 import re
 import json
-from lingua_franca.common import resolve_resource_file
+from lingua_franca.internal import resolve_resource_file
 
 
 def _convert_words_to_numbers_en(text, short_scale=True, ordinals=False):
@@ -362,7 +362,7 @@ def _extract_whole_number_with_text_en(tokens, short_scale, ordinals):
         # twenty two, fifty six
         if (prev_word in _SUMS_EN and val and val < 10) or all([prev_word in
                                                                 multiplies,
-                                                             val < prev_val if prev_val else False]):
+                                                                val < prev_val if prev_val else False]):
             val = prev_val + val
 
         # is the prev word a number and should we multiply it?
@@ -1273,7 +1273,7 @@ def extract_datetime_en(text, anchorDate=None, default_time=None):
                 # ambiguous time, detect whether they mean this evening or
                 # the next morning based on whether it has already passed
                 if anchorDate.hour < HH or (anchorDate.hour == HH and
-                                         anchorDate.minute < MM):
+                                            anchorDate.minute < MM):
                     pass  # No modification needed
                 elif anchorDate.hour < HH + 12:
                     HH += 12

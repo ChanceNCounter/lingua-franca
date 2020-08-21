@@ -24,7 +24,7 @@ from os.path import join
 
 
 from lingua_franca.bracket_expansion import SentenceTreeParser
-from lingua_franca.common import localized_function, \
+from lingua_franca.internal import localized_function, \
     populate_localized_function_dict, get_active_langs, \
     get_full_lang_code, get_default_lang, get_default_loc, \
     is_supported_full_lang, raise_unsupported_language, \
@@ -48,7 +48,7 @@ def _translate_word(name, lang=None):
     Returns:
         str: translated version of resource name
     """
-    from lingua_franca.common import resolve_resource_file
+    from lingua_franca.internal import resolve_resource_file
     if not lang:
         lang = get_default_loc()
 
