@@ -1,6 +1,6 @@
 _MONTHS_HU = ['január', 'február', 'március', 'április', 'május', 'június',
-          'július', 'augusztus', 'szeptember', 'október', 'november',
-          'december']
+              'július', 'augusztus', 'szeptember', 'október', 'november',
+              'december']
 
 _NUM_STRING_HU = {
     0: 'nulla',

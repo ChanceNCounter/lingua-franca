@@ -386,4 +386,3 @@ def nice_time_cs(dt, speech=True, use_24hour=True, use_ampm=False):
                 speak += " a.m."
 
         return speak
-

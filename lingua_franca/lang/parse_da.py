@@ -881,5 +881,6 @@ def extract_numbers_da(text, short_scale=True, ordinals=False):
     return extract_numbers_generic(text, pronounce_number_da, extract_number_da,
                                    short_scale=short_scale, ordinals=ordinals)
 
+
 class DanishNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""

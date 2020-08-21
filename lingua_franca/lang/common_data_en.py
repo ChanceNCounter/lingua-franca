@@ -251,7 +251,7 @@ _NEGATIVES_EN = {"negative", "minus"}
 
 # sum the next number (twenty two = 20 + 2)
 _SUMS_EN = {'twenty', '20', 'thirty', '30', 'forty', '40', 'fifty', '50',
-         'sixty', '60', 'seventy', '70', 'eighty', '80', 'ninety', '90'}
+            'sixty', '60', 'seventy', '70', 'eighty', '80', 'ninety', '90'}
 
 
 def _generate_plurals_en(originals):

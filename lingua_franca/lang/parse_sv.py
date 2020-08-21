@@ -778,5 +778,6 @@ def normalize_sv(text, remove_articles=True):
 
     return normalized[1:]  # strip the initial space
 
+
 class SwedishNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""

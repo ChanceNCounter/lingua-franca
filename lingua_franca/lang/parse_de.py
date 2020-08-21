@@ -894,5 +894,6 @@ def extract_numbers_de(text, short_scale=True, ordinals=False):
     return extract_numbers_generic(text, pronounce_number_de, extract_number_de,
                                    short_scale=short_scale, ordinals=ordinals)
 
+
 class GermanNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""

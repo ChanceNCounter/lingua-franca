@@ -54,8 +54,8 @@ _DA_NUMBERS = {
 }
 
 _MONTHS_DA = ['januar', 'februar', 'märz', 'april', 'mai', 'juni',
-          'juli', 'august', 'september', 'oktober', 'november',
-          'dezember']
+              'juli', 'august', 'september', 'oktober', 'november',
+              'dezember']
 
 _NUM_STRING_DA = {
     0: 'nul',

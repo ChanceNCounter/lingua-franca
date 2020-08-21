@@ -433,12 +433,12 @@ def extract_datetime_fr(text, anchorDate=None, default_time=None):
 
     def date_found():
         return found or \
-               (
-                       datestr != "" or
-                       yearOffset != 0 or monthOffset != 0 or dayOffset or
-                       (isTime and (hrAbs or minAbs)) or
-                       hrOffset != 0 or minOffset != 0 or secOffset != 0
-               )
+            (
+                datestr != "" or
+                yearOffset != 0 or monthOffset != 0 or dayOffset or
+                (isTime and (hrAbs or minAbs)) or
+                hrOffset != 0 or minOffset != 0 or secOffset != 0
+            )
 
     if text == "" or not anchorDate:
         return None
@@ -744,8 +744,8 @@ def extract_datetime_fr(text, anchorDate=None, default_time=None):
                         word.isdigit() and
                         wordNext in ["heures", "heure"] and word != "0" and
                         (
-                                int(word) < 100 or
-                                int(word) > 2400
+                            int(word) < 100 or
+                            int(word) > 2400
                         )):
                     # "dans 3 heures", "à 3 heures"
                     if wordPrev in words_in:
@@ -972,6 +972,7 @@ def is_fractional_fr(input_str, short_scale=True):
 
     return False
 
+
 def normalize_fr(text, remove_articles=True):
     """ French string normalization """
     text = text.lower()
@@ -1025,6 +1026,7 @@ def extract_numbers_fr(text, short_scale=True, ordinals=False):
     """
     return extract_numbers_generic(text, pronounce_number_fr, extract_number_fr,
                                    short_scale=short_scale, ordinals=ordinals)
+
 
 class FrenchNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""

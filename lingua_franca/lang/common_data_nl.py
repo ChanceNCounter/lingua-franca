@@ -267,8 +267,8 @@ _STRING_SHORT_ORDINAL_NL = invert_dict(_SHORT_ORDINAL_STRING_NL)
 _STRING_LONG_ORDINAL_NL = invert_dict(_LONG_ORDINAL_STRING_NL)
 
 _MONTHS_NL = ['januari', 'februari', 'maart', 'april', 'mei', 'juni',
-          'juli', 'augustus', 'september', 'oktober', 'november',
-          'december']
+              'juli', 'augustus', 'september', 'oktober', 'november',
+              'december']
 
 _NUM_STRING_NL = {
     0: 'nul',

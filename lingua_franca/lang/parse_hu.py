@@ -16,8 +16,10 @@
 from datetime import datetime, timedelta
 from lingua_franca.lang.parse_common import Normalizer
 
+
 class HungarianNormalizer(Normalizer):
     """ TODO implement language specific normalizer"""
+
 
 def normalize_hu(text, remove_articles=True):
     """ English string normalization """

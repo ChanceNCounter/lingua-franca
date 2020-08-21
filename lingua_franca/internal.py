@@ -403,8 +403,6 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
         `lingua_franca.internal._localized_functions`,
         and its members are invoked via the `@localized_function` decorator.
 
-        The dictionary is returned for 
-
     Example:
         populate_localized_function_dict("format")["en"]["pronounce_number"](1)
         "one"

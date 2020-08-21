@@ -65,6 +65,7 @@ def is_fractional_pt(input_str, short_scale=True):
 
     return False
 
+
 def extract_number_pt(text, short_scale=True, ordinals=False):
     """
     This function prepares the given text for parsing by making

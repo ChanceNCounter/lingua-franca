@@ -1037,7 +1037,7 @@ def extract_datetime_cs(text, anchorDate=None, default_time=None):
                     start -= 1
                 dayOffset += tmpOffset
         if used > 0:
-            if start - 1 > 0 and (words[start - 1] == "toto" or words[start - 1] == "této"or words[start - 1] == "tento"):
+            if start - 1 > 0 and (words[start - 1] == "toto" or words[start - 1] == "této" or words[start - 1] == "tento"):
                 start -= 1
                 used += 1
 
@@ -1451,7 +1451,7 @@ def extract_datetime_cs(text, anchorDate=None, default_time=None):
                     daySpecified = True
             if idx > 1 and wordPrevPrev in markers:
                 words[idx - 2] = ""
-                if wordPrevPrev == "toto"or wordPrev == "této":
+                if wordPrevPrev == "toto" or wordPrev == "této":
                     daySpecified = True
 
             idx += used - 1

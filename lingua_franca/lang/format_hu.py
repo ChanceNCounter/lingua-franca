@@ -139,7 +139,8 @@ def pronounce_number_hu(number, places=2, short_scale=True, scientific=False,
                 else:
                     result += "egy"
             elif scale_level == 1:
-                result += _EXTRA_SPACE_HU + _NUM_POWERS_OF_TEN[1] + _EXTRA_SPACE_HU
+                result += _EXTRA_SPACE_HU + \
+                    _NUM_POWERS_OF_TEN[1] + _EXTRA_SPACE_HU
             else:
                 result += "egy" + _NUM_POWERS_OF_TEN[scale_level]
         elif last_triplet > 1:
@@ -177,7 +178,7 @@ def pronounce_number_hu(number, places=2, short_scale=True, scientific=False,
             if places > 0:
                 result += " egész "
                 fraction = pronounce_whole_number_hu(
-                                        round(fractional_part * 10 ** places))
+                    round(fractional_part * 10 ** places))
                 result += fraction.replace(_NUM_STRING_HU[2], 'két')
                 fraction_suffixes = [
                     'tized', 'század', 'ezred', 'tízezred', 'százezred']

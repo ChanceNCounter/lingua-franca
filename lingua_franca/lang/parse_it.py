@@ -28,6 +28,7 @@ from lingua_franca.lang.format_it import _LONG_SCALE_IT, _SHORT_SCALE_IT, \
 from lingua_franca.lang.common_data_it import _SHORT_ORDINAL_STRING_IT, \
     _ARTICLES_IT, _LONG_ORDINAL_STRING_IT, _STRING_NUM_IT
 
+
 def is_fractional_it(input_str, short_scale=False):
     """
     This function takes the given text and checks if it is a fraction.
@@ -162,11 +163,11 @@ def _extract_number_long_it(word):
             else:
                 if not components[1]:
                     word = str(_extract_number_long_it(components[0])) + '*' \
-                           + str(int(multiplier[item]))
+                        + str(int(multiplier[item]))
                 else:
                     word = str(_extract_number_long_it(components[0])) + '*' \
-                           + str(int(multiplier[item])) + '+' \
-                           + str(_extract_number_long_it(components[1]))
+                        + str(int(multiplier[item])) + '+' \
+                        + str(_extract_number_long_it(components[1]))
 
     for item in tens:
         word = word.replace(item, '+' + str(tens[item]))
@@ -199,7 +200,7 @@ def _extract_number_long_it(word):
         if components[0].startswith('*'):  # centomila
             components[0] = components[0][1:]
         word = str(_extract_number_long_it(components[0])) + \
-               '*1000' + str(components[1])
+            '*1000' + str(components[1])
 
     # gestione eccezioni
     if word.startswith('*') or word.startswith('+'):
@@ -488,7 +489,7 @@ def extract_datetime_it(text, anchorDate=None, default_time=None):
 
     def date_found():
         return found or \
-               (datestr != '' or time_str != '' or year_offset != 0 or
+            (datestr != '' or time_str != '' or year_offset != 0 or
                 month_offset != 0 or day_offset is True or hr_offset != 0 or
                 hr_abs or min_offset != 0 or min_abs or sec_offset != 0)
 
@@ -981,9 +982,9 @@ def extract_datetime_it(text, anchorDate=None, default_time=None):
             str_mm = int(str_mm) if str_mm else 0
 
             str_hh = str_hh + 12 if remainder == 'pm' \
-                                    and str_hh < 12 else str_hh
+                and str_hh < 12 else str_hh
             str_hh = str_hh - 12 if remainder == 'am' \
-                                    and str_hh >= 12 else str_hh
+                and str_hh >= 12 else str_hh
 
             if (not military and
                     remainder not in ['am', 'pm'] and

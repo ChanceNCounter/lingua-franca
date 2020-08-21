@@ -22,7 +22,7 @@ from .parse_common import is_numeric, look_for_fractions, Token, \
 from .common_data_nl import _SHORT_ORDINAL_STRING_NL, _ARTICLES_NL, \
     _DECIMAL_MARKER_NL, _FRACTION_MARKER_NL, _LONG_ORDINAL_STRING_NL,\
     _LONG_SCALE_NL, _MULTIPLIES_LONG_SCALE_NL, _MULTIPLIES_SHORT_SCALE_NL,\
-    _NEGATIVES_NL, _SHORT_SCALE_NL,_STRING_LONG_ORDINAL_NL, _STRING_NUM_NL, \
+    _NEGATIVES_NL, _SHORT_SCALE_NL, _STRING_LONG_ORDINAL_NL, _STRING_NUM_NL, \
     _STRING_SHORT_ORDINAL_NL, _SUMS_NL
 import re
 
@@ -1131,7 +1131,7 @@ def extract_datetime_nl(text, anchorDate=None, default_time=None):
                 # ambiguous time, detect whether they mean this evening or
                 # the next morning based on whether it has already passed
                 if anchorDate.hour < HH or (anchorDate.hour == HH and
-                                         anchorDate.minute < MM):
+                                            anchorDate.minute < MM):
                     pass  # No modification needed
                 elif anchorDate.hour < HH + 12:
                     HH += 12
