@@ -40,8 +40,33 @@ class FunctionNotLocalizedError(NotImplementedError):
     pass
 
 
+def raise_unsupported_language(language):
+    """
+    Raise an error when a language is unsupported
+
+    Arguments:
+        language: str
+            The language that was supplied.
+    """
+    supported = ' '.join(_SUPPORTED_LANGUAGES)
+    raise UnsupportedLanguageError("\nLanguage '{language}' is not yet "
+                                   "supported by Lingua Franca. "
+                                   "Supported language codes "
+                                   "include the following:\n{supported}"
+                                   .format(language=language, supported=supported))
+
+
 def get_supported_langs():
     return _SUPPORTED_LANGUAGES
+
+
+def get_active_langs():
+    """ Get the list of currently-loaded language codes
+
+    Returns:
+        list(str)
+    """
+    return __loaded_langs
 
 
 def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
@@ -83,15 +108,6 @@ def _refresh_function_dict():
 
 def is_supported_full_lang(lang):
     return lang.lower() in _SUPPORTED_FULL_LOCALIZATIONS
-
-
-def get_active_langs():
-    """ Get the list of currently-loaded language codes
-
-    Returns:
-        list(str)
-    """
-    return __loaded_langs
 
 
 def load_language(lang):
@@ -238,22 +254,6 @@ def get_full_lang_code(lang=None):
         return _DEFAULT_FULL_LANG_CODES[lang]
     else:
         return "en-us"
-
-
-def raise_unsupported_language(language):
-    """
-    Raise an error when a language is unsupported
-
-    Arguments:
-        language: str
-            The language that was supplied.
-    """
-    supported = ' '.join(_SUPPORTED_LANGUAGES)
-    raise UnsupportedLanguageError("\nLanguage '{language}' is not yet "
-                                   "supported by Lingua Franca. "
-                                   "Supported language codes "
-                                   "include the following:\n{supported}"
-                                   .format(language=language, supported=supported))
 
 
 def localized_function(run_own_code_on=[type(None)]):

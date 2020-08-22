@@ -3,15 +3,13 @@
 ## Source code layout
 
 - package `lingua_franca`
-  - `common.py`: common functions and data used by the top-level modules
+  - `internal.py`: common functions and data used by the top-level modules
   - top-level modules (`lingua_franca.format`, `lingua_franca.parse`, etc.)
       - top-level function definitions (`lingua_franca.format.pronounce_number()`, etc.)
       - list of the member functions which have been localized ([func_name (str)])
           ex: `lingua_franca.format.pronounce_number()` 
               is registered in this list as `"pronounce_number"`, as it has been localized.
               This list enables discovery of localized functions.
-      - dict of localized functions - {lang_code (str) : {func_name (str) : func (function)}}
-      - a helper function, which calls localized functions from top-level functions
   - /lang/
       - localized implementations of top-level functions
           - files named uniformly, based on module and language code. ex:
@@ -34,7 +32,7 @@
 
 ## On adding new languages
 
-Ensure that all supported languages are registered in `lingua_franca.common.py`, in the list
+Ensure that all supported languages are registered in `lingua_franca.internal.py`, in the list
 `_SUPPORTED_LANGUAGES`.
 
 ## On writing new functions which will need localization
@@ -78,21 +76,21 @@ code, such as `en-US` or `es-ES`. Details relating to regional dialects reside i
 
 Lingua Franca will find your function by itself, as long as
 
-* Your files are named properly
-* Your function and its signature are named and organized properly (described below) and
-* Your primary language code is registered as a supported language with Lingua Franca itself, in
-`lingua_franca.common._SUPPORTED_LANGUAGES`
+- Your files are named properly
+- Your function and its signature are named and organized properly (described below) and
+- Your primary language code is registered as a supported language with Lingua Franca itself, in
+`lingua_franca.internal._SUPPORTED_LANGUAGES`
 
 What you must do:
 
-* Implement the function with its uniform name, using the appropriate language code.
-  * `lingua_franca.lang.format_en.pronounce_number_en`
-  * `lingua_franca.lang.format_es.pronounce_number_es`
-  * `lingua_franca.lang.format_pt.pronounce_number_pt`
-* Name function arguments exactly as they are named in the top-level modules
-  * You do not need to implement all arguments, but you must name them identically
-  * All arguments must be keyword arguments (except the primary argument)
-  * If you need to add arguments that aren't present in the top-level function,
+- Implement the function with its uniform name, using the appropriate language code.
+  - `lingua_franca.lang.format_en.pronounce_number_en`
+  - `lingua_franca.lang.format_es.pronounce_number_es`
+  - `lingua_franca.lang.format_pt.pronounce_number_pt`
+- Name function arguments exactly as they are named in the top-level modules
+  - You do not need to implement all arguments, but you must name them identically
+  - All arguments must be keyword arguments (except the primary argument)
+  - If you need to add new arguments,
         feel free, but MAKE SURE you add the argument to the top-level function, as a keyword arg.
         This is the only time you should need to modify the top-level functions while localizing.
         Ensure that any new arguments are at the end of the function signatures, both in the
