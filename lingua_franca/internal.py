@@ -137,7 +137,8 @@ def unload_language(lang):
 
 def unload_languages(langs):
     for lang in langs:
-        unload_language(lang)
+        __loaded_langs.remove(lang)
+    _set_active_langs(__loaded_langs)
 
 
 def get_default_lang():
