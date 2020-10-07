@@ -69,7 +69,7 @@ def get_active_langs():
     return __loaded_langs
 
 
-def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
+def _set_active_langs(langs=None, override_default=True):
     """ Set the list of languages to load.
         Unloads previously-loaded languages which are not specified here.
         If the input list does not contain the current default language,
@@ -87,7 +87,7 @@ def set_active_langs(langs=_SUPPORTED_LANGUAGES, override_default=True):
     if isinstance(langs, str):
         langs = [langs]
     if not isinstance(langs, list):
-        raise(TypeError("lingua_franca.internal.set_active_langs expects"
+        raise(TypeError("lingua_franca.internal._set_active_langs expects"
                         " 'str' or 'list'"))
     global __loaded_langs, __default_lang
     __loaded_langs = list(dict.fromkeys(langs))
@@ -126,7 +126,7 @@ def load_language(lang):
         __loaded_langs.append(lang)
     if not __default_lang:
         set_default_lang(lang)
-    set_active_langs(__loaded_langs)
+    _set_active_langs(__loaded_langs)
 
 
 def load_languages(langs):
@@ -137,7 +137,7 @@ def load_languages(langs):
 def unload_language(lang):
     if lang in __loaded_langs:
         __loaded_langs.remove(lang)
-        set_active_langs(__loaded_langs)
+        _set_active_langs(__loaded_langs)
 
 
 def unload_languages(langs):
