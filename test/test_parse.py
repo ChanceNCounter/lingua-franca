@@ -26,13 +26,16 @@ from lingua_franca.parse import get_gender
 from lingua_franca.parse import match_one
 from lingua_franca.parse import normalize
 
+
 def setUpModule():
     # TODO spin off English tests
     load_language('en')
     set_default_lang('en')
 
+
 def tearDownModule():
     unload_language('en')
+
 
 class TestFuzzyMatch(unittest.TestCase):
     def test_matches(self):

@@ -24,8 +24,11 @@ from lingua_franca.parse import normalize
 
 def setUpModule():
     load_language('sv-se')
+
+
 def tearDownModule():
     unload_language('sv-se')
+
 
 class TestNormalize(unittest.TestCase):
     def test_extractnumber_sv(self):

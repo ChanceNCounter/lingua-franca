@@ -22,11 +22,16 @@ from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_number
 from lingua_franca.parse import normalize
 
+
 def setUpModule():
     load_language('pt-pt')
     set_default_lang('pt')
+
+
 def tearDownModule():
     unload_language('pt')
+
+
 class TestNormalize(unittest.TestCase):
     """
         Test cases for Portuguese parsing

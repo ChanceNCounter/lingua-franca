@@ -22,11 +22,16 @@ from lingua_franca.parse import extract_datetime, extract_number, normalize
 
 
 LANG = "nl-nl"
+
+
 def setUpModule():
     load_language('nl-nl')
     set_default_lang('nl-nl')
+
+
 def tearDownModule():
     unload_language('nl')
+
 
 class TestParsing(unittest.TestCase):
     def test_articles(self):

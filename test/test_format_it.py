@@ -23,11 +23,16 @@ from lingua_franca.format import nice_number
 from lingua_franca.format import nice_time
 from lingua_franca.format import pronounce_number
 
+
 def setUpModule():
     load_language('it-it')
     set_default_lang('it')
+
+
 def tearDownModule():
     unload_language('it')
+
+
 NUMBERS_FIXTURE_IT = {
     1.435634: '1.436',
     2: '2',

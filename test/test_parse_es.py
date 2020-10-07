@@ -21,11 +21,16 @@ from lingua_franca.parse import (normalize, extract_numbers, extract_number,
                                  extract_datetime)
 from lingua_franca.lang.parse_es import extract_datetime_es, is_fractional_es
 
+
 def setUpModule():
     load_language('es-es')
     set_default_lang('es')
+
+
 def tearDownModule():
     unload_language('es')
+
+
 class TestNormalize(unittest.TestCase):
     """
         Test cases for Spanish parsing
