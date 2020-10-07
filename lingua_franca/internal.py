@@ -115,11 +115,6 @@ def load_language(lang):
         raise TypeError("lingua_franca.load_language expects 'str' "
                         "(got " + type(lang) + ")")
     if lang not in _SUPPORTED_LANGUAGES:
-        # try:
-        #    _tmp = get_primary_lang_code(lang)
-        # except KeyError:
-        #    raise_unsupported_language(lang)
-        #lang = _tmp
         if lang in _SUPPORTED_FULL_LOCALIZATIONS:
             lang = get_primary_lang_code(lang)
     if lang not in __loaded_langs:
@@ -147,9 +142,12 @@ def unload_languages(langs):
 
 def get_default_lang():
     """ Return the current default language.
-        This returns the active language *family*' such as 'en' or 'es'.
-        For the current localization/full language code, call
-        `get_default_loc()`
+        This returns the active BCP-47 code, such as 'en' or 'es'.
+        For the current localization/full language code,
+        such as 'en-US' or 'es-ES', call `get_default_loc()`
+
+        See:
+            https://en.wikipedia.org/wiki/IETF_language_tag
 
     Returns:
         str: A primary language code, e.g. ("en", or "pt")
@@ -161,6 +159,9 @@ def get_default_loc():
     """ Return the current, localized BCP-47 language code, such as 'en-US'
         or 'es-ES'. For the default language *family* - which is passed to
         most parsers and formatters - call `get_default_lang`
+
+        The 'localized' portion conforms to ISO 3166-1 alpha-2
+        https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
     """
     return __active_lang_code
 
@@ -171,6 +172,9 @@ def set_default_lang(lang_code):
         (ex: `set_default_lang("en")` will default to "en-US")
 
         Will respect localization when passed a full lang code.
+
+        For more information about valid lang codes, see get_default_lang()
+        and get_default_loc()
 
     Args:
         lang(str): BCP-47 language code, e.g. "en-us" or "es-mx"
