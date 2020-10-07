@@ -80,7 +80,7 @@ def _set_active_langs(langs=None, override_default=True):
         langs: {list(str) or str} -- a list of language codes to load
 
     Keyword Arguments:
-        override_default {bool} -- Change default language to first entry if
+        override_default (bool) -- Change default language to first entry if
                                     the current default is no longer present
                                     (default: True)
     """
@@ -107,10 +107,32 @@ def _refresh_function_dict():
 
 
 def is_supported_full_lang(lang):
+    """
+    Arguments:
+        lang (str): a full language code, such as "en-US" (case insensitive)
+
+    Returns:
+        bool - does Lingua Franca support this language code?
+    """
     return lang.lower() in _SUPPORTED_FULL_LOCALIZATIONS
 
 
 def load_language(lang):
+    """Load `lang` and its functions into memory. Will only import those
+       functions which belong to a loaded module. In other words, if you have
+       lingua_franca.parse loaded, but *not* lingua_franca.format,
+       running `load_language('es') will only import the Spanish-language
+       parsers, and not the formatters.
+
+       The reverse is also true: importing a module, such as
+       `import lingua_franca.parse`, will only import those functions
+       which belong to currently-loaded languages.
+
+    Arguments:
+        lang (str): the language code to load (any supported lang code,
+                    whether 'primary' or 'full')
+                    Case-insensitive.
+    """
     if not isinstance(lang, str):
         raise TypeError("lingua_franca.load_language expects 'str' "
                         "(got " + type(lang) + ")")
@@ -125,17 +147,39 @@ def load_language(lang):
 
 
 def load_languages(langs):
+    """Load multiple languages at once
+       Simple for loop using load_language()
+
+    Args:
+        langs (list[str])
+    """
     for lang in langs:
         load_language(lang)
 
 
 def unload_language(lang):
+    """Opposite of load_language()
+       Unloading the default causes the next language in
+       `lingua_franca.get_active_langs()` to become the default.
+
+       Will not stop you from unloading the last language, as this may be
+       desirable for some applications.
+
+    Args:
+        lang (str): language code to unload
+    """
     if lang in __loaded_langs:
         __loaded_langs.remove(lang)
         _set_active_langs(__loaded_langs)
 
 
 def unload_languages(langs):
+    """Opposite of load_languages()
+       Simple for loop using unload_language()
+
+    Args:
+        langs (list[str])
+    """
     for lang in langs:
         __loaded_langs.remove(lang)
     _set_active_langs(__loaded_langs)
@@ -326,18 +370,23 @@ def localized_function(run_own_code_on=[type(None)]):
                 func_params = list(func_signature.parameters)
                 lang_param_index = func_params.index('lang')
 
+                # Momentarily assume we're not passing a lang code
                 lang_code = get_default_lang()
                 full_lang_code = __active_lang_code
+
+                # Check if we're passing a lang as a kwarg
                 if 'lang' in kwargs.keys():
                     lang_code = kwargs['lang']
+
+                # Check if we're passing a lang as a positional arg
                 elif lang_param_index < len(args):
                     if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
                                                   _SUPPORTED_FULL_LOCALIZATIONS):
                         lang_code = args[lang_param_index]
                 if not lang_code:
                     raise ModuleNotFoundError("No language module loaded.")
+
                 if lang_code not in _SUPPORTED_LANGUAGES:
-                    # try:
                     try:
                         lang_code = get_primary_lang_code(lang_code)
                     except ValueError:
@@ -346,9 +395,12 @@ def localized_function(run_own_code_on=[type(None)]):
                         raise_unsupported_language(lang_code)
                     full_lang_code = lang_code
 
+                # Here comes the ugly business.
                 _module_name = func.__module__.split('.')[-1]
                 _module = import_module(".lang." + _module_name +
                                         "_" + lang_code, "lingua_franca")
+                # The nonsense above gets you from lingua_franca.parse
+                # to lingua_franca.lang.parse_xx
                 if _module_name not in _localized_functions.keys():
                     raise ModuleNotFoundError("Module lingua_franca." +
                                               _module_name + " not recognized")
@@ -356,24 +408,47 @@ def localized_function(run_own_code_on=[type(None)]):
                         and lang_code in _SUPPORTED_LANGUAGES:
                     raise ModuleNotFoundError(_module_name + " module of language '" +
                                               lang_code + "' is not currently loaded.")
+
+                # Now we have the appropriate localized module. Let's get
+                # the localized function.
                 func_name = func.__name__.split('.')[-1]
                 try:
                     localized_func = getattr(
                         _module, func_name + "_" + lang_code)
                 except AttributeError:
                     raise FunctionNotLocalizedError
+
+                # At some point in the past, both the module and the language
+                # were imported/loaded, respectively.
+                # When that happened, we cached the *signature* of each
+                # localized function.
+                #
+                # This is the crucial element that allows us to import funcs
+                # on the fly.
+                #
+                # If we didn't find a localized function to correspond with
+                # the wrapped function, we cached NotImplementedError in its
+                # place.
                 loc_signature = _localized_functions[_module_name][lang_code][func_name]
                 if isinstance(loc_signature, type(NotImplementedError())):
                     raise loc_signature
 
+                # We now have a localized function, such as
+                # lingua_franca.parse.extract_datetime_en
+                # Get 'lang' out of its parameters.
                 if 'lang' in kwargs:
                     del kwargs['lang']
                 elif lang_code in args or full_lang_code in args:
                     args = (arg for arg in args if arg not in (
                         lang_code, full_lang_code))
+
+                # Now we call the function, ignoring any kwargs from the
+                # wrapped function that aren't in the localized function.
                 r_val = localized_func(*args, **{arg: val for arg, val
                                                  in kwargs.items()
                                                  if arg in loc_signature.parameters})
+
+                # Unload all the stuff we just assembled and imported
                 del localized_func
                 del _module
                 return r_val
