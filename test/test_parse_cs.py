@@ -16,7 +16,8 @@
 import unittest
 from datetime import datetime, timedelta
 
-from lingua_franca import get_default_lang, set_default_lang, load_language
+from lingua_franca import get_default_lang, set_default_lang, \
+    load_language, unload_language
 from lingua_franca.parse import extract_datetime
 from lingua_franca.parse import extract_duration
 from lingua_franca.parse import extract_number, extract_numbers
@@ -25,7 +26,15 @@ from lingua_franca.parse import get_gender
 from lingua_franca.parse import match_one
 from lingua_franca.parse import normalize
 
-load_language('cs-cz')
+
+def setUpModule():
+    load_language("cs-cz")
+    set_default_lang("cs")
+
+
+def tearDownModule():
+    unload_language("cs")
+
 
 class TestFuzzyMatch(unittest.TestCase):
     def test_matches(self):
@@ -50,12 +59,6 @@ class TestFuzzyMatch(unittest.TestCase):
 
 
 class TestNormalize(unittest.TestCase):
-    def setUp(self):
-        self.old_lang = get_default_lang()
-        set_default_lang("cs-cz")
-
-    def tearDown(self):
-        set_default_lang(self.old_lang)
 
     def test_extract_number(self):
         self.assertEqual(extract_number("tohle je první test",

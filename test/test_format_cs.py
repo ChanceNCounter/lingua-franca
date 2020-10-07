@@ -13,6 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from lingua_franca.format import join_list
+from lingua_franca.format import date_time_format
+from lingua_franca.format import pronounce_number
+from lingua_franca.format import nice_duration
+from lingua_franca.format import nice_year
+from lingua_franca.format import nice_date_time
+from lingua_franca.format import nice_date
+from lingua_franca.format import nice_time
+from lingua_franca.format import nice_number
 import json
 import unittest
 import datetime
@@ -20,19 +29,17 @@ import ast
 import sys
 from pathlib import Path
 
-from lingua_franca import get_default_lang, set_default_lang, load_language
-from lingua_franca.format import nice_number
-from lingua_franca.format import nice_time
-from lingua_franca.format import nice_date
-from lingua_franca.format import nice_date_time
-from lingua_franca.format import nice_year
-from lingua_franca.format import nice_duration
-from lingua_franca.format import pronounce_number
-from lingua_franca.format import date_time_format
-from lingua_franca.format import join_list
+from lingua_franca import get_default_lang, set_default_lang, \
+    load_language, unload_language
 
 
-load_language("cs-cz")
+def setUpModule():
+    load_language("cs-cz")
+    set_default_lang("cs")
+
+
+def tearDownModule():
+    unload_language("cs")
 
 
 NUMBERS_FIXTURE_CS = {
@@ -67,12 +74,6 @@ NUMBERS_FIXTURE_CS = {
 
 
 class TestNiceNumberFormat(unittest.TestCase):
-    def setUp(self):
-        self.old_lang = get_default_lang()
-        set_default_lang("cs-cz")
-
-    def tearDown(self):
-        set_default_lang(self.old_lang)
 
     def test_convert_float_to_nice_number(self):
         for number, number_str in NUMBERS_FIXTURE_CS.items():
@@ -102,12 +103,6 @@ class TestNiceNumberFormat(unittest.TestCase):
 
 
 class TestPronounceNumber(unittest.TestCase):
-    def setUp(self):
-        self.old_lang = get_default_lang()
-        set_default_lang("cs-cz")
-
-    def tearDown(self):
-        set_default_lang(self.old_lang)
 
     def test_convert_int(self):
         self.assertEqual(pronounce_number(0), "nula")
@@ -377,13 +372,6 @@ class TestNiceDateFormat(unittest.TestCase):
                       str(sub_dir / 'date_time_test.json'))
                 with (sub_dir / 'date_time_test.json').open() as f:
                     cls.test_config[sub_dir.parts[-1]] = json.loads(f.read())
-
-    def setUp(self):
-        self.old_lang = get_default_lang()
-        set_default_lang("cs-cz")
-
-    def tearDown(self):
-        set_default_lang(self.old_lang)
 
     def test_convert_times(self):
         dt = datetime.datetime(2017, 1, 31,

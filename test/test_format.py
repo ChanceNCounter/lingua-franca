@@ -43,8 +43,10 @@ def setUpModule():
     # don't have to do this confusing thing in the "master" test_format.py
     set_default_lang('en-us')
 
+
 def tearDownModule():
     unload_languages(get_active_langs())
+
 
 NUMBERS_FIXTURE_EN = {
     1.435634: '1.436',
@@ -80,6 +82,7 @@ NUMBERS_FIXTURE_EN = {
 class TestNiceNumberFormat(unittest.TestCase):
 
     tmp_var = None
+
     def set_tmp_var(self, val):
         self.tmp_var = val
 
@@ -124,6 +127,7 @@ class TestNiceNumberFormat(unittest.TestCase):
         # NotImplementedError, but nice_number() bypasses and returns
         # its input as a string
         self.assertWarns(UserWarning, bypass_warning)
+
 
 class TestPronounceNumber(unittest.TestCase):
     def test_convert_int(self):
@@ -215,12 +219,12 @@ class TestPronounceNumber(unittest.TestCase):
                                         "power of negative one hundred "
                                         "and fifty")
         # value is platform dependent so better not use in tests?
-        #self.assertEqual(
+        # self.assertEqual(
         #    pronounce_number(sys.float_info.min), "two point two two times "
         #                                          "ten to the power of "
         #                                          "negative three hundred "
         #                                          "and eight")
-        #self.assertEqual(
+        # self.assertEqual(
         #    pronounce_number(sys.float_info.max), "one point seven nine "
         #                                          "times ten to the power of"
         #                                          " three hundred and eight")
@@ -382,6 +386,8 @@ class TestPronounceNumber(unittest.TestCase):
 
 # def nice_time(dt, lang="en-us", speech=True, use_24hour=False,
 #              use_ampm=False):
+
+
 class TestNiceDateFormat(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -535,12 +541,6 @@ class TestNiceDateFormat(unittest.TestCase):
                 self.assertEqual(p['assertEqual'],
                                  nice_date(dt, lang=lang, now=now))
                 i = i + 1
-
-        # test fall back to english
-#        dt = datetime.datetime(2018, 2, 4, 0, 2, 3)
-#        self.assertEqual(nice_date(
-#            dt, lang='invalid', now=datetime.datetime(2018, 2, 4, 0, 2, 3)),
-#            'today')
 
         # test all days in a year for all languages,
         # that some output is produced
