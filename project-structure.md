@@ -2,59 +2,32 @@
 
 ## Source code layout
 
-- package `lingua_franca`
-  - `internal.py`: common functions and data used by the top-level modules
-  - top-level modules (`lingua_franca.format`, `lingua_franca.parse`, etc.)
-      - top-level function definitions (`lingua_franca.format.pronounce_number()`, etc.)
-      - list of the member functions which have been localized ([func_name (str)])
-          ex: `lingua_franca.format.pronounce_number()` 
-              is registered in this list as `"pronounce_number"`, as it has been localized.
-              This list enables discovery of localized functions.
-  - /lang/
-      - localized implementations of top-level functions
-          - files named uniformly, based on module and language code. ex:
-              `lingua_franca.format` will look for localized functions in
-              `lingua_franca.lang.format_<lang_code>`, such as
-              `lingua_franca.lang.format_en` and `lingua_franca.lang.format_es`.
-      - localized `common_data_<lang_code>`
-          - functions and data related to parsing and formatting for a particular language
-              - names of months, days
-              - default date and time format
-              - names of certain numbers
-              - etc.
-  - /res/: fully localized data (en_US and en_GB, etc.)
-      - detailed formatting instructions for dates and times
-      - localized vocabulary
-  - /test/: pyunit tests, files named for their members
-          (`test_format.py`, `test_format_en.py`, `test_format_es.py`, etc.)
+    * user-facing functions live here
+    
+    lingua_franca/
+    ├─ __init__.py * (exposes certain internal functions)
+    ├─ format.py *
+    ├─ internal.py
+    ├─ time.py *
+    ├─ parse.py *
+    ├─ lang/ (localized functions and basic language data)
+    │  ├─ common_data_<>.py (data structures related to language '<>')
+    │  ├─ format_<>.py (localized formatters)
+    │  ├─ parse_<>.py (localized parsers)
+    ├─ res/ (fully localized data, 'en-us' vs 'en-au' and etc.)
+    │  ├─ text/
+    │  │  ├─ <lang-code>/
+    │  │  │  ├─ date_time.json
+    │  │  │  ├─ common words
 
 ----
 
-## On adding new languages
+## Adding new languages
 
 Ensure that all supported languages are registered in `lingua_franca.internal.py`, in the list
 `_SUPPORTED_LANGUAGES`.
 
-## On writing new functions which will need localization
-
-Ensure that all functions which will have localized versions are registered in their module's
-`_REGISTERED_FUNCTIONS` tuple, conventionally defined near the top.
-
-For example, formatters which have been or will be localized are registered in
-  `lingua_franca.format._REGISTERED_FUNCTIONS`, by name only.
-
-As of July, 2020, this tuple looks as follows:
-
-  ```python3
-  # lingua_franca/format.py
-
-  _REGISTERED_FUNCTIONS = ("nice_number",
-                         "nice_time",
-                         "pronounce_number",
-                         "nice_response")
-  ```
-
-## On localizing functions
+## Localizing functions
 
 If you are localizing an existing top-level function, there is no need to alter the top-level
 module to which your function belongs. As mentioned above, Lingua Franca will discover all
@@ -95,3 +68,42 @@ What you must do:
         This is the only time you should need to modify the top-level functions while localizing.
         Ensure that any new arguments are at the end of the function signatures, both in the
         top-level function, and in your localized function.
+
+## Adding new functions
+
+Ensure that all functions which will have localized versions are registered in their module's
+`_REGISTERED_FUNCTIONS` tuple, conventionally defined near the top.
+
+For example, formatters which have been or will be localized are registered in
+  `lingua_franca.format._REGISTERED_FUNCTIONS`, by name only.
+
+As of July, 2020, this tuple looks as follows:
+
+  ```python3
+  # lingua_franca/format.py
+
+  _REGISTERED_FUNCTIONS = ("nice_number",
+                         "nice_time",
+                         "pronounce_number",
+                         "nice_response")
+  ```
+
+All top-level functions which have localized versions are wrapped using
+`lingua_franca.internal.localized_function`, like so:
+
+    @localized_function
+    def foo(bar, baz):
+        pass
+
+Note that this function is a pass-through, and would not be executed even if it
+had logic of its own. The wrapper can fall back on the wrapped function if it is
+passed an error or errors as triggers:
+
+    @localized_function(run_own_code_on=[ValueError, IndexError])
+    def func(bar, baz):
+        print("Something happened!")
+
+In the above example, calling `func(x, y)` will usually find and call a localized
+version of `func`. However, if during that process something raises a
+`ValueError` or `IndexError`, then (and only then) it will execute `func` itself,
+and print "Something happened!"

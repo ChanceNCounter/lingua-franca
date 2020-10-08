@@ -230,6 +230,10 @@ def get_gender(word, context="", lang=None):
 def is_fractional(input_str, short_scale=True, lang=None):
     """
     This function takes the given text and checks if it is a fraction.
+    Used by most of the number exractors.
+
+    Will return False on phrases that *contain* a fraction. Only detects
+    exact matches. To pull a fraction from a string, see extract_number()
 
     Args:
         input_str (str): the string to check if fractional
@@ -237,7 +241,6 @@ def is_fractional(input_str, short_scale=True, lang=None):
         lang (str): the BCP-47 code for the language to use, None uses default
     Returns:
         (bool) or (float): False if not a fraction, otherwise the fraction
-
     """
 
 
