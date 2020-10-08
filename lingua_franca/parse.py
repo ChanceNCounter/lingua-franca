@@ -19,7 +19,7 @@ from warnings import warn
 from lingua_franca.time import now_local
 from lingua_franca.internal import populate_localized_function_dict, \
     get_active_langs, get_full_lang_code, get_primary_lang_code, \
-    get_default_lang, localized_function, raise_unsupported_language
+    get_default_lang, localized_function, _raise_unsupported_language
 
 _REGISTERED_FUNCTIONS = ("extract_numbers",
                          "extract_number",

@@ -40,7 +40,7 @@ class FunctionNotLocalizedError(NotImplementedError):
     pass
 
 
-def raise_unsupported_language(language):
+def _raise_unsupported_language(language):
     """
     Raise an error when a language is unsupported
 
@@ -57,6 +57,10 @@ def raise_unsupported_language(language):
 
 
 def get_supported_langs():
+    """
+    Returns:
+        list(str)
+    """
     return _SUPPORTED_LANGUAGES
 
 
@@ -229,7 +233,7 @@ def set_default_lang(lang_code):
     lang_code = lang_code.lower()
     primary_lang_code = get_primary_lang_code(lang_code)
     if primary_lang_code not in _SUPPORTED_LANGUAGES:
-        raise_unsupported_language(lang_code)
+        _raise_unsupported_language(lang_code)
     else:
         __default_lang = primary_lang_code
 
@@ -391,9 +395,9 @@ def localized_function(run_own_code_on=[type(None)]):
                     try:
                         lang_code = get_primary_lang_code(lang_code)
                     except ValueError:
-                        raise_unsupported_language(lang_code)
+                        _raise_unsupported_language(lang_code)
                     if lang_code not in _SUPPORTED_LANGUAGES:
-                        raise_unsupported_language(lang_code)
+                        _raise_unsupported_language(lang_code)
                     full_lang_code = lang_code
 
                 # Here comes the ugly business.

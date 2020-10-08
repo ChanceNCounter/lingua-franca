@@ -27,7 +27,7 @@ from lingua_franca.bracket_expansion import SentenceTreeParser
 from lingua_franca.internal import localized_function, \
     populate_localized_function_dict, get_active_langs, \
     get_full_lang_code, get_default_lang, get_default_loc, \
-    is_supported_full_lang, raise_unsupported_language, \
+    is_supported_full_lang, _raise_unsupported_language, \
     UnsupportedLanguageError
 
 
@@ -37,6 +37,7 @@ _REGISTERED_FUNCTIONS = ("nice_number",
                          "nice_response")
 
 populate_localized_function_dict("format", langs=get_active_langs())
+
 
 def _translate_word(name, lang=None):
     """ Helper to get word translations
@@ -236,6 +237,7 @@ class DateTimeFormat:
 date_time_format = DateTimeFormat(os.path.join(os.path.dirname(__file__),
                                                'res/text'))
 
+
 @localized_function(run_own_code_on=[UnsupportedLanguageError])
 def nice_number(number, lang=None, speech=True, denominators=None):
     """Format a float to human readable functions
@@ -251,6 +253,7 @@ def nice_number(number, lang=None, speech=True, denominators=None):
         (str): The formatted string.
     """
     return str(number)
+
 
 @localized_function()
 def nice_time(dt, lang=None, speech=True, use_24hour=False,
@@ -271,6 +274,7 @@ def nice_time(dt, lang=None, speech=True, use_24hour=False,
         (str): The formatted time string
     """
 
+
 @localized_function()
 def pronounce_number(number, lang=None, places=2, short_scale=True,
                      scientific=False, ordinals=False):
@@ -288,6 +292,7 @@ def pronounce_number(number, lang=None, places=2, short_scale=True,
     Returns:
         (str): The pronounced number
     """
+
 
 def nice_date(dt, lang=None, now=None):
     """
@@ -504,6 +509,7 @@ def expand_options(parentheses_line: str) -> list:
     # 'a(this|that)b' -> [['a', 'this', 'b'], ['a', 'that', 'b']]
     options = expand_parentheses(re.split(r'([(|)])', parentheses_line))
     return [re.sub(r'\s+', ' ', ' '.join(i)).strip() for i in options]
+
 
 @localized_function()
 def nice_response(text, lang=None):
