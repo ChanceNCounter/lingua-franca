@@ -302,7 +302,7 @@ _NUM_STRING_NL = {
     100: 'honderd'
 }
 
-# German uses "long scale" https://en.wikipedia.org/wiki/Long_and_short_scales
+# Dutch uses "long scale" https://en.wikipedia.org/wiki/Long_and_short_scales
 # Currently, numbers are limited to 1000000000000000000000000,
 # but _NUM_POWERS_OF_TEN can be extended to include additional number words
 
@@ -315,9 +315,9 @@ _NUM_POWERS_OF_TEN = [
 # Numbers below 1 million are written in one word in dutch, yielding very
 # long words
 # In some circumstances it may better to seperate individual words
-# Set _EXTRA_SPACE_DA=" " for separating numbers below 1 million (
+# Set _EXTRA_SPACE_NL=" " for separating numbers below 1 million (
 # orthographically incorrect)
-# Set _EXTRA_SPACE_DA="" for correct spelling, this is standard
+# Set _EXTRA_SPACE_NL="" for correct spelling, this is standard
 
-# _EXTRA_SPACE_DA = " "
+# _EXTRA_SPACE_NL = " "
 _EXTRA_SPACE_NL = ""

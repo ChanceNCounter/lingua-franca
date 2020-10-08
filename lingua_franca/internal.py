@@ -226,6 +226,7 @@ def set_default_lang(lang_code):
     """
     global __default_lang, __active_lang_code
 
+    lang_code = lang_code.lower()
     primary_lang_code = get_primary_lang_code(lang_code)
     if primary_lang_code not in _SUPPORTED_LANGUAGES:
         raise_unsupported_language(lang_code)
@@ -240,8 +241,8 @@ def set_default_lang(lang_code):
     __loaded_langs.insert(0, __default_lang)
     _refresh_function_dict()
 
-    if is_supported_full_lang(lang_code.lower()):
-        __active_lang_code = lang_code.lower()
+    if is_supported_full_lang(lang_code):
+        __active_lang_code = lang_code
     else:
         __active_lang_code = get_full_lang_code(__default_lang)
 
@@ -404,8 +405,7 @@ def localized_function(run_own_code_on=[type(None)]):
                 if _module_name not in _localized_functions.keys():
                     raise ModuleNotFoundError("Module lingua_franca." +
                                               _module_name + " not recognized")
-                if lang_code not in _localized_functions[_module_name].keys() \
-                        and lang_code in _SUPPORTED_LANGUAGES:
+                if lang_code not in _localized_functions[_module_name].keys():
                     raise ModuleNotFoundError(_module_name + " module of language '" +
                                               lang_code + "' is not currently loaded.")
 

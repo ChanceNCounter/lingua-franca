@@ -122,7 +122,7 @@ _FRACTION_STRING_DA = {
     20: 'tyvendedel'
 }
 
-# Numbers below 1 million are written in one word in German, yielding very
+# Numbers below 1 million are written in one word in Danish, yielding very
 # long words
 # In some circumstances it may better to seperate individual words
 # Set _EXTRA_SPACE_DA=" " for separating numbers below 1 million (
