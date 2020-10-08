@@ -1,6 +1,7 @@
 import unittest
 import lingua_franca
 import lingua_franca.parse
+import lingua_franca.format
 
 
 def unload_all_languages():
@@ -25,6 +26,25 @@ class TestException(unittest.TestCase):
     def test_must_load_language(self):
         self.assertRaises(ModuleNotFoundError,
                           lingua_franca.parse.extract_number, 'one')
+
+    def test_run_own_code_on(self):
+        unload_all_languages()
+
+        # nice_number() has a run_own_code_on for unrecognized languages,
+        # because backwards compatibility requires it to fall back on
+        # str(input_value) rather than failing loudly
+        #
+        # 'cz' is not a supported language, so the function will raise
+        # an UnsupportedLanguageError, but nice_number() is decorated with
+        # @localized_function(run_own_code_on=[UnsupportedLanguageError])
+        self.assertEqual(lingua_franca.format.nice_number(123, lang='cz'),
+                         "123")
+        self.assertEqual(lingua_franca.format.nice_number(123.45, lang='cz'),
+                         "123.45")
+        # It won't intercept other exceptions, though!
+        with self.assertRaises(ModuleNotFoundError):
+            lingua_franca.format.nice_number(123.45)
+            # ModuleNotFoundError: No language module loaded.
 
 
 class TestLanguageLoading(unittest.TestCase):

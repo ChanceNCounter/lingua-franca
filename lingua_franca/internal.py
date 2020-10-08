@@ -368,99 +368,107 @@ def localized_function(run_own_code_on=[type(None)]):
 
     # Begin wrapper
     def localized_function_decorator(func):
+        # Wrapper's logic
+        def _call_localized_function(func, *args, **kwargs):
+            func_signature = signature(func)
+            func_params = list(func_signature.parameters)
+            lang_param_index = func_params.index('lang')
+
+            # Momentarily assume we're not passing a lang code
+            lang_code = get_default_lang()
+            full_lang_code = __active_lang_code
+
+            # Check if we're passing a lang as a kwarg
+            if 'lang' in kwargs.keys():
+                lang_code = kwargs['lang']
+
+            # Check if we're passing a lang as a positional arg
+            elif lang_param_index < len(args):
+                if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
+                                              _SUPPORTED_FULL_LOCALIZATIONS):
+                    lang_code = args[lang_param_index]
+            if not lang_code:
+                raise ModuleNotFoundError("No language module loaded.")
+
+            if lang_code not in _SUPPORTED_LANGUAGES:
+                try:
+                    lang_code = get_primary_lang_code(lang_code)
+                except ValueError:
+                    _raise_unsupported_language(lang_code)
+                if lang_code not in _SUPPORTED_LANGUAGES:
+                    _raise_unsupported_language(lang_code)
+                full_lang_code = lang_code
+
+            # Here comes the ugly business.
+            _module_name = func.__module__.split('.')[-1]
+            _module = import_module(".lang." + _module_name +
+                                    "_" + lang_code, "lingua_franca")
+            # The nonsense above gets you from lingua_franca.parse
+            # to lingua_franca.lang.parse_xx
+            if _module_name not in _localized_functions.keys():
+                raise ModuleNotFoundError("Module lingua_franca." +
+                                          _module_name + " not recognized")
+            if lang_code not in _localized_functions[_module_name].keys():
+                raise ModuleNotFoundError(_module_name + " module of language '" +
+                                          lang_code + "' is not currently loaded.")
+
+            # Now we have the appropriate localized module. Let's get
+            # the localized function.
+            func_name = func.__name__.split('.')[-1]
+            try:
+                localized_func = getattr(
+                    _module, func_name + "_" + lang_code)
+            except AttributeError:
+                raise FunctionNotLocalizedError
+
+            # At some point in the past, both the module and the language
+            # were imported/loaded, respectively.
+            # When that happened, we cached the *signature* of each
+            # localized function.
+            #
+            # This is the crucial element that allows us to import funcs
+            # on the fly.
+            #
+            # If we didn't find a localized function to correspond with
+            # the wrapped function, we cached NotImplementedError in its
+            # place.
+            loc_signature = _localized_functions[_module_name][lang_code][func_name]
+            if isinstance(loc_signature, type(NotImplementedError())):
+                raise loc_signature
+
+            # We now have a localized function, such as
+            # lingua_franca.parse.extract_datetime_en
+            # Get 'lang' out of its parameters.
+            if 'lang' in kwargs:
+                del kwargs['lang']
+            elif lang_code in args or full_lang_code in args:
+                args = (arg for arg in args if arg not in (
+                    lang_code, full_lang_code))
+
+            # Now we call the function, ignoring any kwargs from the
+            # wrapped function that aren't in the localized function.
+            r_val = localized_func(*args, **{arg: val for arg, val
+                                             in kwargs.items()
+                                             if arg in loc_signature.parameters})
+
+            # Unload all the stuff we just assembled and imported
+            del localized_func
+            del _module
+            return r_val
+
+        # Actual wrapper
         @wraps(func)
         def call_localized_function(*args, **kwargs):
-            try:
-                func_signature = signature(func)
-                func_params = list(func_signature.parameters)
-                lang_param_index = func_params.index('lang')
-
-                # Momentarily assume we're not passing a lang code
-                lang_code = get_default_lang()
-                full_lang_code = __active_lang_code
-
-                # Check if we're passing a lang as a kwarg
-                if 'lang' in kwargs.keys():
-                    lang_code = kwargs['lang']
-
-                # Check if we're passing a lang as a positional arg
-                elif lang_param_index < len(args):
-                    if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
-                                                  _SUPPORTED_FULL_LOCALIZATIONS):
-                        lang_code = args[lang_param_index]
-                if not lang_code:
-                    raise ModuleNotFoundError("No language module loaded.")
-
-                if lang_code not in _SUPPORTED_LANGUAGES:
-                    try:
-                        lang_code = get_primary_lang_code(lang_code)
-                    except ValueError:
-                        _raise_unsupported_language(lang_code)
-                    if lang_code not in _SUPPORTED_LANGUAGES:
-                        _raise_unsupported_language(lang_code)
-                    full_lang_code = lang_code
-
-                # Here comes the ugly business.
-                _module_name = func.__module__.split('.')[-1]
-                _module = import_module(".lang." + _module_name +
-                                        "_" + lang_code, "lingua_franca")
-                # The nonsense above gets you from lingua_franca.parse
-                # to lingua_franca.lang.parse_xx
-                if _module_name not in _localized_functions.keys():
-                    raise ModuleNotFoundError("Module lingua_franca." +
-                                              _module_name + " not recognized")
-                if lang_code not in _localized_functions[_module_name].keys():
-                    raise ModuleNotFoundError(_module_name + " module of language '" +
-                                              lang_code + "' is not currently loaded.")
-
-                # Now we have the appropriate localized module. Let's get
-                # the localized function.
-                func_name = func.__name__.split('.')[-1]
+            if run_own_code_on != [type(None)]:
                 try:
-                    localized_func = getattr(
-                        _module, func_name + "_" + lang_code)
-                except AttributeError:
-                    raise FunctionNotLocalizedError
-
-                # At some point in the past, both the module and the language
-                # were imported/loaded, respectively.
-                # When that happened, we cached the *signature* of each
-                # localized function.
-                #
-                # This is the crucial element that allows us to import funcs
-                # on the fly.
-                #
-                # If we didn't find a localized function to correspond with
-                # the wrapped function, we cached NotImplementedError in its
-                # place.
-                loc_signature = _localized_functions[_module_name][lang_code][func_name]
-                if isinstance(loc_signature, type(NotImplementedError())):
-                    raise loc_signature
-
-                # We now have a localized function, such as
-                # lingua_franca.parse.extract_datetime_en
-                # Get 'lang' out of its parameters.
-                if 'lang' in kwargs:
-                    del kwargs['lang']
-                elif lang_code in args or full_lang_code in args:
-                    args = (arg for arg in args if arg not in (
-                        lang_code, full_lang_code))
-
-                # Now we call the function, ignoring any kwargs from the
-                # wrapped function that aren't in the localized function.
-                r_val = localized_func(*args, **{arg: val for arg, val
-                                                 in kwargs.items()
-                                                 if arg in loc_signature.parameters})
-
-                # Unload all the stuff we just assembled and imported
-                del localized_func
-                del _module
-                return r_val
-            except Exception as e:
-                if any((isinstance(e, error) for error in run_own_code_on)):
-                    return func(*args, **kwargs)
-                else:
-                    raise e
+                    return _call_localized_function(func, *args, **kwargs)
+                except Exception as e:  # Intercept, check for run_own_code_on
+                    if any((isinstance(e, error) for error in run_own_code_on)):
+                        return func(*args, **kwargs)
+                    else:
+                        raise e
+            else:  # don't intercept any exceptions
+                return _call_localized_function(func, *args, **kwargs)
         return call_localized_function
     try:
         return localized_function_decorator
