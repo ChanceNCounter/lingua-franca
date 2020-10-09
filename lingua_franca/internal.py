@@ -427,15 +427,7 @@ def localized_function(run_own_code_on=[type(None)]):
                 raise ModuleNotFoundError(_module_name + " module of language '" +
                                           lang_code + "' is not currently loaded.")
 
-            # Now we have the appropriate localized module. Let's get
-            # the localized function.
             func_name = func.__name__.split('.')[-1]
-            try:
-                localized_func = getattr(
-                    _module, func_name + "_" + lang_code)
-            except AttributeError:
-                raise FunctionNotLocalizedError
-
             # At some point in the past, both the module and the language
             # were imported/loaded, respectively.
             # When that happened, we cached the *signature* of each
@@ -450,6 +442,14 @@ def localized_function(run_own_code_on=[type(None)]):
             loc_signature = _localized_functions[_module_name][lang_code][func_name]
             if isinstance(loc_signature, type(NotImplementedError())):
                 raise loc_signature
+
+            # Now we have the appropriate localized module. Let's get
+            # the localized function.
+            try:
+                localized_func = getattr(
+                    _module, func_name + "_" + lang_code)
+            except AttributeError:
+                raise FunctionNotLocalizedError(func_name, lang_code)
 
             # We now have a localized function, such as
             # lingua_franca.parse.extract_datetime_en
