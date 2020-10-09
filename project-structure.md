@@ -30,8 +30,8 @@ Ensure that all supported languages are registered in `lingua_franca.internal.py
 ## Localizing functions
 
 If you are localizing an existing top-level function, there is no need to alter the top-level
-module to which your function belongs. As mentioned above, Lingua Franca will discover all
-localized versions of its top-level functions.
+module to which your function belongs. Lingua Franca will discover all localized versions
+of its top-level functions.
 
 Localized functions live in `lingua_franca/lang/`, in files named for their corresponding module.
 
@@ -62,7 +62,7 @@ What you must do:
   - `lingua_franca.lang.format_pt.pronounce_number_pt`
 - Name function arguments exactly as they are named in the top-level modules
   - You do not need to implement all arguments, but you must name them identically
-  - All arguments must be keyword arguments (except the primary argument)
+  - All arguments must be keyword arguments (except the primary arguments)
   - If you need to add new arguments,
         feel free, but MAKE SURE you add the argument to the top-level function, as a keyword arg.
         This is the only time you should need to modify the top-level functions while localizing.
