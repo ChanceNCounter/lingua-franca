@@ -301,13 +301,15 @@ def get_full_lang_code(lang=None):
     """
     if lang is None:
         return __active_lang_code.lower()
-
+    elif not isinstance(lang, str):
+        raise TypeError("get_full_lang_code expects str, "
+                        "got {}".format(type(lang)))
     if lang.lower() in _SUPPORTED_FULL_LOCALIZATIONS:
         return lang
     elif lang in _DEFAULT_FULL_LANG_CODES:
         return _DEFAULT_FULL_LANG_CODES[lang]
     else:
-        return "en-us"
+        raise UnsupportedLanguageError(lang)
 
 
 def localized_function(run_own_code_on=[type(None)]):
@@ -353,20 +355,28 @@ def localized_function(run_own_code_on=[type(None)]):
 
     """
     # Make sure everything in run_own_code_on is an Error or None
+    BadTypeError = \
+        ValueError("@localized_function(run_own_code_on=<>) expected an "
+                   "Error type, or a list of Error types. Instead, it "
+                   "received this value:\n" + str(run_own_code_on))
+
     def is_error_type(_type):
+        if not callable(_type):
+            return False
         _instance = _type()
         rval = isinstance(_instance, BaseException) if _instance else True
         del _instance
         return rval
     if not isinstance(run_own_code_on, list):
-        run_own_code_on = list(run_own_code_on)
+        try:
+            run_own_code_on = list(run_own_code_on)
+        except TypeError:
+            raise BadTypeError
     if run_own_code_on != [None]:
         if not all((is_error_type(e) for e in run_own_code_on)):
-            raise ValueError("@localized_function(run_own_code_on=<>) expected an "
-                             "Error type, or a list of Error types. Instead, it "
-                             "received this value:\n" + str(run_own_code_on))
-
+            raise BadTypeError
     # Begin wrapper
+
     def localized_function_decorator(func):
         # Wrapper's logic
         def _call_localized_function(func, *args, **kwargs):
@@ -376,7 +386,6 @@ def localized_function(run_own_code_on=[type(None)]):
 
             # Momentarily assume we're not passing a lang code
             lang_code = get_default_lang()
-            full_lang_code = __active_lang_code
 
             # Check if we're passing a lang as a kwarg
             if 'lang' in kwargs.keys():
@@ -384,20 +393,26 @@ def localized_function(run_own_code_on=[type(None)]):
 
             # Check if we're passing a lang as a positional arg
             elif lang_param_index < len(args):
-                if args[lang_param_index] in (_SUPPORTED_LANGUAGES,
-                                              _SUPPORTED_FULL_LOCALIZATIONS):
+                arg_in_lang_pos = args[lang_param_index]
+                if arg_in_lang_pos in _SUPPORTED_LANGUAGES or \
+                        arg_in_lang_pos in _SUPPORTED_FULL_LOCALIZATIONS:
                     lang_code = args[lang_param_index]
             if not lang_code:
                 raise ModuleNotFoundError("No language module loaded.")
 
             if lang_code not in _SUPPORTED_LANGUAGES:
                 try:
+                    tmp = lang_code
                     lang_code = get_primary_lang_code(lang_code)
                 except ValueError:
                     _raise_unsupported_language(lang_code)
                 if lang_code not in _SUPPORTED_LANGUAGES:
                     _raise_unsupported_language(lang_code)
-                full_lang_code = lang_code
+                full_lang_code = tmp
+            else:
+                full_lang_code = get_full_lang_code(lang_code) if \
+                    lang_code != get_default_lang() \
+                    else get_full_lang_code()
 
             # Here comes the ugly business.
             _module_name = func.__module__.split('.')[-1]
@@ -441,15 +456,15 @@ def localized_function(run_own_code_on=[type(None)]):
             # Get 'lang' out of its parameters.
             if 'lang' in kwargs:
                 del kwargs['lang']
-            elif lang_code in args or full_lang_code in args:
-                args = (arg for arg in args if arg not in (
-                    lang_code, full_lang_code))
+            args = tuple(arg for arg in list(args) if
+                         arg not in (lang_code, full_lang_code))
 
             # Now we call the function, ignoring any kwargs from the
             # wrapped function that aren't in the localized function.
-            r_val = localized_func(*args, **{arg: val for arg, val
-                                             in kwargs.items()
-                                             if arg in loc_signature.parameters})
+            r_val = localized_func(*args,
+                                   **{arg: val for arg, val
+                                      in kwargs.items()
+                                      if arg in loc_signature.parameters})
 
             # Unload all the stuff we just assembled and imported
             del localized_func
@@ -457,7 +472,7 @@ def localized_function(run_own_code_on=[type(None)]):
             return r_val
 
         # Actual wrapper
-        @wraps(func)
+        @ wraps(func)
         def call_localized_function(*args, **kwargs):
             if run_own_code_on != [type(None)]:
                 try:
@@ -500,8 +515,8 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
         "one"
     """
     bad_lang_code = "Language code '{}' is registered with" \
-                    " Lingua Franca, but its " + lf_module + " module" \
-                    " could not be found."
+        " Lingua Franca, but its " + lf_module + " module" \
+        " could not be found."
     return_dict = {}
     for lang_code in langs:
         primary_lang_code = get_primary_lang_code(lang_code)
@@ -515,7 +530,7 @@ def populate_localized_function_dict(lf_module, langs=get_active_langs()):
             del lang_common_data
         except Exception:
             _FUNCTION_NOT_FOUND = "This function has not been implemented" \
-                                  " in the specified language."
+                " in the specified language."
         _FUNCTION_NOT_FOUND = FunctionNotLocalizedError(_FUNCTION_NOT_FOUND)
 
         try:
