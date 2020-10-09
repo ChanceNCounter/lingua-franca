@@ -36,7 +36,6 @@ class TestException(unittest.TestCase):
                           lingua_franca.parse.extract_number, 'one')
 
     def test_run_own_code_on(self):
-        unload_all_languages()
 
         # nice_number() has a run_own_code_on for unrecognized languages,
         # because backwards compatibility requires it to fall back on
@@ -74,7 +73,6 @@ class TestException(unittest.TestCase):
 
 class TestLanguageLoading(unittest.TestCase):
     def test_load_language(self):
-        unload_all_languages()
         lingua_franca.load_language('en')
 
         # Verify that English is loaded and, since it's the only language
@@ -93,7 +91,6 @@ class TestLanguageLoading(unittest.TestCase):
         unload_all_languages()
 
     def test_auto_default_language(self):
-        unload_all_languages()
         lingua_franca.load_language('en')
 
         # Load two languages, ensure first is default
@@ -103,7 +100,6 @@ class TestLanguageLoading(unittest.TestCase):
         unload_all_languages()
 
     def test_set_default_language(self):
-        unload_all_languages()
         lingua_franca.load_languages(['es', 'en'])
         lingua_franca.set_default_lang('en')
         self.assertEqual(lingua_franca.get_default_lang(), 'en')
@@ -113,7 +109,6 @@ class TestLanguageLoading(unittest.TestCase):
             lingua_franca.set_default_lang('foobar')
 
     def test_default_language_singles(self):
-        unload_all_languages()
 
         # Load languages one at a time, ensure first is default
         self.assertEqual(lingua_franca.get_active_langs(), [])
@@ -133,7 +128,6 @@ class TestLanguageLoading(unittest.TestCase):
         unload_all_languages()
 
     def test_set_active_langs(self):
-        unload_all_languages()
         lingua_franca.load_languages(['en', 'es'])
         self.assertEqual(lingua_franca.get_active_langs(),
                          ['en', 'es'])
@@ -147,12 +141,18 @@ class TestLanguageLoading(unittest.TestCase):
 
 class TestLocalizerEdgeCases(unittest.TestCase):
     def test_pass_lang_code_positionally(self):
-        unload_all_languages()
         lingua_franca.load_languages(['en', 'es'])
 
         self.assertEqual(
             lingua_franca.parse.extract_number("dos", True, False, 'es'),
             2)
+        unload_all_languages()
+
+    def test_function_not_localized_error(self):
+        lingua_franca.load_language('en')
+        with self.assertRaises(
+                lingua_franca.internal.FunctionNotLocalizedError):
+            lingua_franca.parse.is_ordinal("twelve")
         unload_all_languages()
 
 
